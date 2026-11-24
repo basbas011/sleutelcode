@@ -1,0 +1,12 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+dist/
+
+# Signing: NOOIT committen
+keystore/
+keystore.properties
+*.jks
+*.keystore

@@ -1,0 +1,65 @@
+name: Build APK
+
+on:
+  push:
+    tags: ['v*']          # tag v1.2.3 -> signed APK + GitHub Release
+  workflow_dispatch:      # handmatig starten -> APK als download bij de run
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Keystore uit secrets klaarzetten
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Secrets KEYSTORE_BASE64 en KEYSTORE_PASSWORD ontbreken (Settings > Secrets and variables > Actions). Zonder vaste key kunnen updates niet installeren."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Versie bepalen
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "APP_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "APP_VERSION=0.0.${GITHUB_RUN_NUMBER}-dev" >> "$GITHUB_ENV"
+          fi
+
+      - name: Bouwen
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease -PversionName="$APP_VERSION" --no-daemon
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/app-${APP_VERSION}.apk"
+
+      - name: Release publiceren (alleen bij tag)
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/app-${{ env.APP_VERSION }}.apk
+          generate_release_notes: true
+
+      - name: APK als download bewaren (handmatige run)
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: dist/*.apk

@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#121417">
+<title>Sleutelcode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#121417; --card:#1b1e23; --line:#2a2e35; --text:#e9e6df; --muted:#9a978f;
+    --brass:#e8b54a; --brass-d:#b98a2a; --cyan:#4fd1e8; --yellow:#f3e04f; --mag:#ef5da8; --green:#6be36b; --ok:#5fd38d; --warn:#ff9f43;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.45}
+  main{max-width:720px;margin:0 auto;padding:16px 14px 60px}
+  header{display:flex;align-items:center;gap:12px;margin:6px 0 18px}
+  header svg{flex:none}
+  h1{font-size:22px;margin:0;letter-spacing:-.01em}
+  header p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  .step{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-weight:600;font-size:16px}
+  .num{width:26px;height:26px;border-radius:50%;background:var(--brass);color:#1a1405;display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px}
+  select,input[type=number],input[type=text]{width:100%;background:#111317;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit}
+  select:focus,input:focus{outline:2px solid var(--brass-d);outline-offset:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .spec{font-size:13px;color:var(--muted);margin-top:10px}
+  .btn{appearance:none;border:1px solid var(--line);background:#252930;color:var(--text);border-radius:10px;padding:11px 14px;font:inherit;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.35;cursor:default}
+  .btn.primary{background:var(--brass);border-color:var(--brass);color:#1a1405}
+  .btn.sm{padding:8px 10px;min-height:38px;font-size:14px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .row .grow{flex:1}
+  .filebtn{position:relative;overflow:hidden}
+  .filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .tips{margin:12px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+  .tips li{margin:2px 0}
+  #work{display:none}
+  .canvaswrap{position:relative;border-radius:12px;overflow:hidden;background:#0b0c0e;border:1px solid var(--line);margin:10px 0}
+  canvas#cv{display:block;width:100%;touch-action:none}
+  #loupe{position:absolute;top:8px;left:8px;width:130px;height:130px;border-radius:50%;border:2px solid var(--brass);display:none;pointer-events:none;background:#000}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .legend span::before{content:"";display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle;background:var(--c)}
+  .slider{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+  .slider input{flex:1;accent-color:var(--brass)}
+  .howto{font-size:13px;color:var(--muted);margin:8px 0 0}
+  .howto b{color:var(--text);font-weight:600}
+  .code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:44px;font-weight:700;letter-spacing:.12em;text-align:center;color:var(--brass);margin:6px 0 2px;word-break:break-word}
+  .code.small{font-size:22px;letter-spacing:.04em;line-height:1.5}
+  .codesub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0 12px}
+  th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--muted);font-weight:500}
+  td.mono{font-family:"JetBrains Mono",monospace}
+  tr.sidehead td{color:var(--brass);font-weight:600;padding-top:12px}
+  .ok{color:var(--ok)} .warn{color:var(--warn)}
+  .note{font-size:12.5px;color:var(--muted);background:#15171b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
+  .saved{list-style:none;padding:0;margin:8px 0 0}
+  .saved li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .saved .n{flex:1;min-width:0}
+  .saved .n b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .saved .n small{color:var(--muted)}
+  .saved .c{font-family:"JetBrains Mono",monospace;color:var(--brass);font-weight:700;font-size:12px;max-width:45%;text-align:right}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2b2f36;color:var(--text);padding:10px 16px;border-radius:10px;border:1px solid var(--line);opacity:0;transition:opacity .2s;pointer-events:none;font-size:14px;max-width:90vw;text-align:center}
+  .toast.show{opacity:1}
+  #customBox,#freeBox{display:none;margin-top:12px}
+  .hidden{display:none!important}
+  .manual{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+  .mtitle{font-weight:600;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{appearance:none;border:1.5px solid var(--line);background:#15171b;color:var(--text);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:36px}
+  .chip i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:-1px}
+  .chip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,#15171b)}
+  .pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(3,56px);gap:8px;justify-content:center;margin:6px 0}
+  .arrow{font-size:20px;padding:0;min-height:0;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+  .stepbtn{font-size:13px;background:#15171b}
+  .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{flex:1;appearance:none;border:0;background:#15171b;color:var(--muted);font:inherit;font-weight:600;padding:10px;cursor:pointer;min-height:42px}
+  .seg button.on{background:var(--brass);color:#1a1405}
+  .sidebox{margin-top:12px}
+  .check{display:flex;align-items:center;gap:10px;color:var(--text);font-size:14px;margin:10px 0 0;cursor:pointer}
+  .check input{width:20px;height:20px;accent-color:var(--brass)}
+  .fitbar{display:flex;align-items:center;gap:10px;background:#15171b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+  #fitDot{width:12px;height:12px;border-radius:50%;background:#555;flex:none}
+  .groove{background:#15171b;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px}
+  .groove.on{border-color:var(--green)}
+  .ghead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .ghead b{flex:1}
+  .ghead select{width:auto;padding:7px 8px;font-size:13px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .grid3 label{font-size:11.5px}
+  .stp{display:flex;align-items:stretch}
+  .stp button{width:26px;flex:none;border:1px solid var(--line);background:#252930;color:var(--text);font:inherit;font-weight:700;cursor:pointer;touch-action:manipulation}
+  .stp button:first-child{border-radius:8px 0 0 8px} .stp button:last-child{border-radius:0 8px 8px 0}
+  .stp input{border-radius:0!important;padding:8px 0!important;-moz-appearance:textfield;text-align:center;min-width:0;font-size:13px!important}
+  .stp input::-webkit-outer-spin-button,.stp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  #sketch{width:100%;display:block;background:#f4f1ea;border-radius:10px;margin:6px 0 4px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="11" cy="20" r="8" fill="none" stroke="#e8b54a" stroke-width="3"/><path d="M19 17h18v6h-3l-2 3-2-3-2 3-2-3-2 3-2-3h-3z" fill="#e8b54a"/></svg>
+    <div><h1>Sleutelcode</h1><p>Foto van je sleutel → maten van de inkepingen voor de sleutelmaker</p></div>
+  </header>
+
+  <section class="card">
+    <div class="step"><span class="num">1</span>Kies het type sleutel</div>
+    <label for="profile">Profiel</label>
+    <select id="profile"></select>
+
+    <div id="freeBox">
+      <label for="stamp" style="margin-top:4px">Gestempelde code op sleutel/slot (optioneel)</label>
+      <input type="text" id="stamp" placeholder="bv. C47" maxlength="12" autocapitalize="characters">
+      <label style="margin-top:12px">Schaal bepalen via</label>
+      <div class="seg" id="calSeg">
+        <button data-m="ref" class="on">Liniaal / munt in foto</button>
+        <button data-m="blade">Bladhoogte gemeten</button>
+      </div>
+      <div id="calRef" style="margin-top:10px">
+        <label for="refLen">Afstand tussen de groene punten (mm)</label>
+        <div class="row">
+          <input type="number" id="refLen" step="0.01" value="10" style="flex:1;width:auto">
+          <button class="btn sm" data-ref="10">10 mm</button>
+          <button class="btn sm" data-ref="23.25">€1</button>
+          <button class="btn sm" data-ref="25.75">€2</button>
+        </div>
+        <p class="spec" style="margin-top:6px">Leg een liniaal (of munt) plat naast de sleutel. Zet straks de twee groene punten op twee streepjes die je kent, of op de rand van de munt.</p>
+      </div>
+      <div id="calBlade" class="hidden" style="margin-top:10px">
+        <label for="bladeMm">Hoogte van het blad bij de schouder (mm, met schuifmaat)</label>
+        <input type="number" id="bladeMm" step="0.01" placeholder="bv. 6.80">
+      </div>
+    </div>
+
+    <div id="customBox">
+      <div class="grid2">
+        <div><label>Aantal inkepingen</label><input type="number" id="c_cuts" min="2" max="10" step="1"></div>
+        <div><label>Bladhoogte (mm)</label><input type="number" id="c_blade" step="0.01"></div>
+        <div><label>1e inkeping vanaf schouder (mm)</label><input type="number" id="c_first" step="0.01"></div>
+        <div><label>Afstand tussen inkepingen (mm)</label><input type="number" id="c_spacing" step="0.01"></div>
+        <div><label>Laagste code</label><input type="number" id="c_min" step="1"></div>
+        <div><label>Hoogste code</label><input type="number" id="c_max" step="1"></div>
+        <div><label>Hoogte bij laagste code (mm)</label><input type="number" id="c_d0" step="0.01"></div>
+        <div><label>Stap per code (mm)</label><input type="number" id="c_inc" step="0.001"></div>
+      </div>
+    </div>
+    <div class="spec" id="specText"></div>
+  </section>
+
+  <section class="card">
+    <div class="step"><span class="num">2</span>Maak een foto</div>
+    <div class="row">
+      <label class="btn primary filebtn grow" style="margin:0;color:#1a1405">📷 Foto maken
+        <input type="file" accept="image/*" capture="environment" id="fileCam">
+      </label>
+      <label class="btn filebtn grow" style="margin:0;color:var(--text)">🖼️ Kies uit galerij
+        <input type="file" accept="image/*" id="fileGal">
+      </label>
+    </div>
+    <ul class="tips">
+      <li>Leg de sleutel plat op <b>wit papier</b>, inkepingen naar boven.</li>
+      <li id="tipRuler">Leg een <b>liniaal</b> (of munt) er vlak naast, op dezelfde hoogte.</li>
+      <li>Houd de telefoon <b>recht erboven</b> en vul het beeld zoveel mogelijk.</li>
+      <li>Goed licht zonder harde schaduw. Gebruik geen flits van dichtbij.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="work">
+    <div class="step"><span class="num">3</span>Uitlijnen en meten</div>
+    <div class="row">
+      <button class="btn sm" id="rotL" title="90° linksom">↺ 90°</button>
+      <button class="btn sm" id="rotR" title="90° rechtsom">↻ 90°</button>
+      <button class="btn sm" id="mirror" title="Spiegelen">⇋ Spiegel</button>
+      <span class="grow"></span>
+      <button class="btn sm" id="zoomOut">−</button>
+      <button class="btn sm" id="zoomIn">+</button>
+      <button class="btn sm" id="zoomReset">Passend</button>
+    </div>
+    <div class="slider" style="margin-top:10px">Recht zetten <input type="range" id="fine" min="-20" max="20" step="0.1" value="0"><span id="fineVal" style="width:44px;text-align:right">0°</span></div>
+
+    <div class="sidebox" id="sideBox">
+      <div class="seg" id="sideSeg">
+        <button data-s="A" class="on">Kant A</button>
+        <button data-s="B">Kant B</button>
+      </div>
+      <p class="spec" style="margin-top:6px">Inkepingen aan twee kanten? Meet eerst kant A. Tik daarna op <b>Kant B</b>, draai de foto 2× ↻ (180°) en meet opnieuw.</p>
+    </div>
+
+    <div class="canvaswrap" id="wrap">
+      <canvas id="cv"></canvas>
+      <canvas id="loupe" width="260" height="260"></canvas>
+    </div>
+    <div class="legend">
+      <span style="--c:var(--mag)">Schouder (aanslag)</span>
+      <span style="--c:var(--yellow)">Bovenkant blad</span>
+      <span style="--c:var(--cyan)">Onderkant blad</span>
+      <span style="--c:var(--brass)">Inkepingen</span>
+      <span style="--c:var(--green)" id="legRef">Schaal (liniaal)</span>
+    </div>
+    <p class="howto" id="howFixed">
+      <b>1.</b> Draai/spiegel tot de kop <b>links</b> zit en de inkepingen <b>boven</b>.
+      <b>2.</b> Roze lijn op de schouder (waar de sleutel tegen het slot stopt).
+      <b>3.</b> Gele lijn op de onbewerkte bovenkant van het blad, blauwe lijn op de onderkant.
+      <b>4.</b> Tik <b>Automatisch meten</b> en controleer elk bolletje: het moet op de bodem van de inkeping zitten.
+    </p>
+    <p class="howto hidden" id="howFree">
+      <b>1.</b> Draai/spiegel tot de kop <b>links</b> zit en de inkepingen <b>boven</b>.
+      <b>2.</b> Roze lijn op de schouder, gele lijn op de <b>onbewerkte</b> bovenkant (vlak bij de schouder), blauwe lijn op de onderkant.
+      <b>3.</b> Zet de twee <b>groene punten</b> op de liniaal (bv. op 0 en 10 mm).
+      <b>4.</b> Tik <b>Inkepingen zoeken</b>, of voeg ze zelf toe met <b>+ Inkeping</b>. Elk bolletje moet op het <b>diepste punt</b> van een inkeping zitten.
+    </p>
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary grow" id="auto">✨ Automatisch meten</button>
+    </div>
+
+    <div class="manual" id="tplBox">
+      <div class="mtitle">Passende lijn &amp; code</div>
+      <div class="fitbar"><span id="fitDot"></span><span id="fitText">Plaats eerst inkepingen</span></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary grow" id="fitBtn">🎯 Lijn passend maken</button>
+      </div>
+      <label class="check"><input type="checkbox" id="tplShow" checked> Toon sjabloonlijn op de foto</label>
+      <label class="check"><input type="checkbox" id="rasterOn"> Code-raster: inkepingen klikken op vaste dieptes</label>
+      <div class="grid2" style="margin-top:8px">
+        <div><label for="rStep">Stap per code (mm)</label><input type="number" id="rStep" step="0.01" value="0.30"></div>
+        <div><label for="rZero">Code van onbewerkt blad</label><input type="number" id="rZero" step="1" value="0"></div>
+        <div><label for="tAngle">Hoek inkeping</label><select id="tAngle"><option value="90">90°</option><option value="100" selected>100°</option><option value="110">110°</option><option value="80">80°</option><option value="60">60°</option></select></div>
+        <div><label for="tFlat">Bodembreedte (mm)</label><input type="number" id="tFlat" step="0.05" value="0.40"></div>
+      </div>
+      <p class="spec">De lijn tekent hoe een sleutel met deze inkepingen er precies uitziet. Past de lijn overal strak op de rand van je sleutel (groen), dan kloppen de maten. Met het raster aan schuift ▲▼ een inkeping steeds één code-stand verder.</p>
+    </div>
+
+    <div class="manual">
+      <div class="mtitle">Handmatig met knoppen</div>
+      <label>1. Kies wat je wilt verschuiven</label>
+      <div class="chips" id="chips"></div>
+      <div class="row" style="margin-top:8px" id="freeBtns">
+        <button class="btn sm grow" id="addMark">＋ Inkeping</button>
+        <button class="btn sm grow" id="delMark">🗑 Verwijder gekozen</button>
+      </div>
+      <label style="margin-top:10px">2. Verschuif</label>
+      <div class="pad">
+        <span></span><button class="btn arrow" data-dx="0" data-dy="-1" aria-label="Omhoog">▲</button><span></span>
+        <button class="btn arrow" data-dx="-1" data-dy="0" aria-label="Links">◀</button>
+        <button class="btn arrow stepbtn" id="stepBtn">Fijn</button>
+        <button class="btn arrow" data-dx="1" data-dy="0" aria-label="Rechts">▶</button>
+        <span></span><button class="btn arrow" data-dx="0" data-dy="1" aria-label="Omlaag">▼</button><span></span>
+      </div>
+      <p class="spec" style="text-align:center">Ingedrukt houden = blijven schuiven. Middelste knop wisselt tussen fijn en grof.</p>
+      <div class="row" style="margin-top:6px">
+        <button class="btn sm grow" id="snapBtn">⌖ Op code zetten</button>
+        <button class="btn sm grow" id="nextBtn">Volgende ›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="result">
+    <div class="step"><span class="num">4</span><span id="resTitle">Je sleutelcode</span></div>
+    <div class="code" id="codeOut">–</div>
+    <div class="codesub" id="codeSub"></div>
+    <canvas id="sketch" class="hidden"></canvas>
+    <table>
+      <thead id="cutHead"></thead>
+      <tbody id="cutTable"></tbody>
+    </table>
+    <div class="row">
+      <button class="btn primary grow" id="copy">📋 Kopieer voor sleutelmaker</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input type="text" id="saveName" placeholder="Naam, bv. Archiefkast" style="flex:1;width:auto">
+      <button class="btn" id="save">Opslaan</button>
+    </div>
+    <textarea id="copyFallback" class="hidden" readonly style="margin-top:10px;width:100%;min-height:140px;background:#111317;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:13px 'JetBrains Mono',monospace"></textarea>
+    <div class="note" id="resNote"></div>
+  </section>
+
+  <section class="card" id="profCard">
+    <div class="step"><span class="num">5</span>Profiel (groeven) &amp; 3D-model</div>
+    <p class="spec" style="margin-top:0">De groeven in de lengte van de sleutel bepalen welke blanco sleutel de sleutelmaker nodig heeft. Maak een foto <b>recht op de punt</b>, zodat je de doorsnede ziet. Leg de lijnen eromheen en zet de groeven goed.</p>
+
+    <div class="grid2">
+      <div><label for="pH">Bladhoogte (mm)</label><input type="number" id="pH" step="0.05"></div>
+      <div><label for="pT">Dikte (mm)</label><input type="number" id="pT" step="0.05"></div>
+      <div><label for="pL">Bladlengte vanaf schouder (mm)</label><input type="number" id="pL" step="0.1"></div>
+      <div><label for="pTip">Lengte van de punt (mm)</label><input type="number" id="pTip" step="0.1"></div>
+      <div><label for="pBowL">Kop: lengte (mm)</label><input type="number" id="pBowL" step="0.5"></div>
+      <div><label for="pBowH">Kop: hoogte (mm)</label><input type="number" id="pBowH" step="0.5"></div>
+      <div><label for="pHole">Gat in kop Ø (mm, 0 = geen)</label><input type="number" id="pHole" step="0.5"></div>
+      <div style="display:flex;align-items:flex-end"><button class="btn sm" id="pAuto" style="width:100%">↺ Uit meting overnemen</button></div>
+    </div>
+
+    <div class="mtitle" style="margin-top:16px">Doorsnede (foto van de punt)</div>
+    <div class="row">
+      <label class="btn sm filebtn grow" style="margin:0;color:var(--text)">📷 Foto van de punt
+        <input type="file" accept="image/*" capture="environment" id="secCam">
+      </label>
+      <label class="btn sm filebtn grow" style="margin:0;color:var(--text)">🖼️ Galerij
+        <input type="file" accept="image/*" id="secGal">
+      </label>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm" id="secRot">↻ 90°</button>
+      <span class="grow"></span>
+      <button class="btn sm" id="secOut">−</button>
+      <button class="btn sm" id="secIn">+</button>
+      <button class="btn sm" id="secFit">Passend</button>
+    </div>
+    <div class="canvaswrap"><canvas id="cv2" style="display:block;width:100%;touch-action:none"></canvas></div>
+    <div class="legend">
+      <span style="--c:var(--yellow)">Bovenkant</span>
+      <span style="--c:var(--cyan)">Onderkant</span>
+      <span style="--c:var(--mag)">Zijkanten (dikte)</span>
+      <span style="--c:var(--green)">Passende doorsnede</span>
+    </div>
+    <p class="howto">Draai de foto zo dat de <b>inkepingen boven</b> zitten. Sleep de gele en blauwe lijn op boven- en onderkant en de roze lijnen op beide zijkanten. De dikte wordt dan zelf berekend. Voeg daarna groeven toe en schuif ze tot de groene lijn precies in de groeven van je foto valt.</p>
+
+    <div id="grooves"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm grow" id="addL">＋ Groef links</button>
+      <button class="btn sm grow" id="addR">＋ Groef rechts</button>
+    </div>
+
+    <div class="mtitle" style="margin-top:16px">3D-model</div>
+    <div class="row">
+      <button class="btn primary grow" id="dlModel">⬇️ Download 3D-model (.zip)</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm grow" id="copyScad">📋 Kopieer OpenSCAD-code</button>
+    </div>
+    <textarea id="scadFallback" class="hidden" readonly style="margin-top:10px;width:100%;min-height:160px;background:#111317;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:12px 'JetBrains Mono',monospace"></textarea>
+    <div class="note">De zip bevat <b>sleutel.scad</b> en <b>maten.txt</b>. Open de .scad in OpenSCAD, druk <b>F6</b> en exporteer als STL. Gebruik een geprinte sleutel alleen om te testen of de maten kloppen. Hij is te zwak om echt een slot mee te openen.</div>
+  </section>
+
+  <section class="card" id="savedCard">
+    <div class="step" style="margin-bottom:4px">Opgeslagen sleutels</div>
+    <ul class="saved" id="savedList"></ul>
+    <p class="spec" id="savedEmpty">Nog niets opgeslagen. Opgeslagen sleutels blijven alleen in deze browser op dit toestel.</p>
+  </section>
+  <footer id="appFooter" class="hidden" style="text-align:center;color:var(--muted);font-size:13px;padding:6px 0 10px">
+    <span id="appVer"></span> · <button class="btn sm" id="appUpd" style="margin-left:6px">Zoek naar updates</button>
+  </footer>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+// Android-app: native brug (klembord, opslaan, updates). Op het web is dit null.
+const AND = (window.Android && typeof window.Android.version==='function') ? window.Android : null;
+function clip(t){ if(AND){ AND.copy(t); return Promise.resolve(); } return navigator.clipboard.writeText(t); }
+const IN = 25.4;
+const PROFILES = {
+  free: {name:'Merk onbekend – vrij meten (kast/meubelsleutel)', free:true},
+  kw1:  {name:'Kwikset KW1 (5 pins)', cuts:5, first:.247*IN, spacing:.150*IN, blade:.335*IN, min:1, max:7, d0:.329*IN, inc:.023*IN},
+  kw10: {name:'Kwikset KW10 (6 pins)', cuts:6, first:.247*IN, spacing:.150*IN, blade:.335*IN, min:1, max:7, d0:.329*IN, inc:.023*IN},
+  sc1:  {name:'Schlage SC1 (5 pins)', cuts:5, first:.231*IN, spacing:.156*IN, blade:.335*IN, min:0, max:9, d0:.335*IN, inc:.015*IN},
+  sc4:  {name:'Schlage SC4 (6 pins)', cuts:6, first:.231*IN, spacing:.156*IN, blade:.335*IN, min:0, max:9, d0:.335*IN, inc:.015*IN},
+  custom:{name:'Eigen profiel (bekende maten)', cuts:5, first:4.0, spacing:4.0, blade:9.0, min:1, max:8, d0:8.5, inc:0.5}
+};
+const $ = id => document.getElementById(id);
+const sel = $('profile');
+for (const k in PROFILES){ const o=document.createElement('option'); o.value=k; o.textContent=PROFILES[k].name; sel.appendChild(o); }
+
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+const customSaved = store.get('sc_custom', null);
+if (customSaved) Object.assign(PROFILES.custom, customSaved);
+sel.value = store.get('sc_profile','free');
+if (!PROFILES[sel.value]) sel.value='free';
+
+const cfields = {cuts:'c_cuts',blade:'c_blade',first:'c_first',spacing:'c_spacing',min:'c_min',max:'c_max',d0:'c_d0',inc:'c_inc'};
+for (const k in cfields) $(cfields[k]).value = +(+PROFILES.custom[k]).toFixed(3);
+for (const k in cfields) $(cfields[k]).addEventListener('input', ()=>{
+  const v = parseFloat($(cfields[k]).value);
+  if (!isFinite(v)) return;
+  PROFILES.custom[k] = (k==='cuts'||k==='min'||k==='max') ? Math.round(v) : v;
+  PROFILES.custom.cuts=Math.max(1,Math.min(12,PROFILES.custom.cuts));
+  const {name,...rest}=PROFILES.custom; store.set('sc_custom',rest);
+  onProfile();
+});
+
+// ---------- state ----------
+const S = { img:null, rot90:0, fine:0, mirror:false, zoom:1, panX:0, panY:0,
+  RW:0, RH:0, shoulderX:0, topY:0, bottomY:0, cuts:[], pix:null,
+  marks:[], ref:[{x:0,y:0},{x:0,y:0}], tipX:null, side:'A', frozen:{A:null,B:null},
+  cal:{mode:store.get('sc_calmode','ref'), refLen:store.get('sc_reflen',10), blade:null},
+  sel:'shoulder', fineStep:true,
+  tpl:Object.assign({show:true, raster:false, step:0.30, zero:0, angle:100, flat:0.40}, store.get('sc_tpl',{})), fit:null };
+const cv=$('cv'), ctx=cv.getContext('2d'), loupe=$('loupe'), lctx=loupe.getContext('2d');
+const rot = document.createElement('canvas'); const rctx = rot.getContext('2d',{willReadFrequently:true});
+let cssW=0, cssH=0, dpr=1;
+
+function P(){ return PROFILES[sel.value]; }
+function isFree(){ return !!P().free; }
+
+// ---------- calibration UI ----------
+$('refLen').value=S.cal.refLen;
+function setCalMode(m){
+  S.cal.mode=m; store.set('sc_calmode',m);
+  document.querySelectorAll('#calSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  $('calRef').classList.toggle('hidden',m!=='ref'); $('calBlade').classList.toggle('hidden',m!=='blade');
+  $('legRef').classList.toggle('hidden',m!=='ref'||!isFree());
+  buildChips(); render(); compute();
+}
+document.querySelectorAll('#calSeg button').forEach(b=>b.onclick=()=>setCalMode(b.dataset.m));
+$('refLen').addEventListener('input',()=>{ const v=parseFloat($('refLen').value); if(v>0){S.cal.refLen=v; store.set('sc_reflen',v); render(); compute();} });
+document.querySelectorAll('[data-ref]').forEach(b=>b.onclick=()=>{ $('refLen').value=b.dataset.ref; S.cal.refLen=+b.dataset.ref; store.set('sc_reflen',S.cal.refLen); render(); compute(); });
+$('bladeMm').addEventListener('input',()=>{ const v=parseFloat($('bladeMm').value); S.cal.blade = v>0?v:null; render(); compute(); });
+$('stamp').addEventListener('input',compute);
+
+function onProfile(){
+  const p=P(), free=isFree();
+  $('customBox').style.display = sel.value==='custom' ? 'block':'none';
+  $('freeBox').style.display = free ? 'block':'none';
+  $('sideBox').classList.toggle('hidden',!free);
+  $('howFree').classList.toggle('hidden',!free); $('howFixed').classList.toggle('hidden',free);
+  $('freeBtns').classList.toggle('hidden',!free); $('tplBox').classList.toggle('hidden',!free); $('snapBtn').classList.toggle('hidden',free);
+  $('legRef').classList.toggle('hidden',!(free&&S.cal.mode==='ref'));
+  $('tipRuler').classList.toggle('hidden',!free);
+  $('auto').textContent = free ? '✨ Inkepingen zoeken' : '✨ Automatisch meten';
+  $('specText').textContent = free
+    ? 'Je meet de echte maten in mm: positie van elke inkeping vanaf de schouder en hoe diep hij is. Dat werkt voor elk merk.'
+    : `${p.cuts} inkepingen · 1e op ${p.first.toFixed(2)} mm · steek ${p.spacing.toFixed(2)} mm · codes ${p.min}–${p.max} · stap ${p.inc.toFixed(3)} mm`;
+  store.set('sc_profile', sel.value);
+  if (!free && S.cuts.length !== p.cuts){
+    const old=S.cuts; S.cuts=[]; for(let i=0;i<p.cuts;i++) S.cuts.push(old[i]!=null?old[i]:null);
+  }
+  if(!validSel()) S.sel='shoulder';
+  buildChips(); render(); compute();
+}
+sel.addEventListener('change', onProfile);
+
+// ---------- template settings ----------
+$('tplShow').checked=S.tpl.show; $('rasterOn').checked=S.tpl.raster; $('rStep').value=S.tpl.step.toFixed(2);
+$('rZero').value=S.tpl.zero; $('tAngle').value=String(S.tpl.angle); $('tFlat').value=S.tpl.flat.toFixed(2);
+function saveTpl(){ store.set('sc_tpl',S.tpl); render(); compute(); }
+$('tplShow').onchange=e=>{ S.tpl.show=e.target.checked; saveTpl(); };
+$('rasterOn').onchange=e=>{ S.tpl.raster=e.target.checked; if(S.tpl.raster) snapAll(); saveTpl(); };
+$('rStep').oninput=e=>{ const v=parseFloat(e.target.value); if(v>0.02){ S.tpl.step=v; if(S.tpl.raster) snapAll(); saveTpl(); } };
+$('rZero').oninput=e=>{ const v=parseInt(e.target.value,10); if(isFinite(v)){ S.tpl.zero=v; saveTpl(); } };
+$('tAngle').onchange=e=>{ S.tpl.angle=+e.target.value; saveTpl(); };
+$('tFlat').oninput=e=>{ const v=parseFloat(e.target.value); if(v>=0){ S.tpl.flat=v; saveTpl(); } };
+
+function runPerDepth(){ return Math.tan(S.tpl.angle/2*Math.PI/180); }   // horizontale mm per mm diepte
+// diepte (mm) van de sjabloonlijn op positie xmm vanaf de schouder
+function tplDepth(xmm, rows){
+  const t=runPerDepth(), hf=S.tpl.flat/2; let d=0;
+  for(const r of rows){ const v=r.depth - Math.max(0,Math.abs(xmm-r.pos)-hf)/t; if(v>d) d=v; }
+  return d;
+}
+function tplEnd(rows){ const t=runPerDepth(); let e=0; for(const r of rows) e=Math.max(e, r.pos+S.tpl.flat/2+r.depth*t); return e; }
+function codeOf(depth){ return S.tpl.zero + Math.round(depth/S.tpl.step); }
+function depthOfLevel(code){ return (code-S.tpl.zero)*S.tpl.step; }
+function snapMark(m){ const k=ppm(); if(!k) return; const d=Math.max(0,(m.y-S.topY)/k); m.y=S.topY+depthOfLevel(codeOf(d))*k; }
+function snapAll(){ if(isFree()) S.marks.forEach(snapMark); }
+function keyColors(){
+  const h=S.bottomY-S.topY, r=Math.max(1,Math.round(h*0.04)), sx=S.shoulderX+h*0.35;
+  const key=avg(sx, S.bottomY-h*0.25, r), bg=avg(sx, S.topY-h*0.6, r)||avg(sx,S.topY-h*0.3,r);
+  return key&&bg ? {key,bg} : null;
+}
+// vergelijk sjabloonlijn met de echte rand van de sleutel
+function computeFit(){
+  S.fit=null;
+  const k=ppm(); if(!isFree()||!S.img||!k||!S.marks.length) return;
+  const col=keyColors(); if(!col) return;
+  const rows=freeRows(), h=S.bottomY-S.topY, mid=(S.topY+S.bottomY)/2;
+  const x0=S.shoulderX+0.3*k, x1=S.shoulderX+(tplEnd(rows)+0.3)*k;
+  let sum=0,n=0; const per=rows.map(()=>({s:0,n:0}));
+  const t=runPerDepth();
+  for(let x=Math.round(x0); x<=x1; x+=1){
+    const e=edgeAt(x,col.key,col.bg,S.topY-h*0.25,mid); if(e==null) continue;
+    const xm=(x-S.shoulderX)/k, dev=Math.abs((e-S.topY)/k - tplDepth(xm,rows));
+    sum+=dev; n++;
+    rows.forEach((r,i)=>{ if(Math.abs(xm-r.pos) <= S.tpl.flat/2+r.depth*t*0.8+0.1){ per[i].s+=dev; per[i].n++; } });
+  }
+  if(!n) return;
+  S.fit={avg:sum/n, per:per.map(p=>p.n?p.s/p.n:null)};
+}
+function fitColor(v){ return v==null?'#555':v<0.06?'#5fd38d':v<0.12?'#f3e04f':'#ff9f43'; }
+function fitWord(v){ return v<0.06?'past strak':v<0.12?'past redelijk':'past niet goed'; }
+function updateFitBar(){
+  if(!isFree()) return;
+  const f=S.fit;
+  $('fitDot').style.background=fitColor(f&&f.avg);
+  $('fitText').textContent = !S.marks.length ? 'Plaats eerst inkepingen' : !ppm() ? 'Stel eerst de schaal in (groene punten of bladhoogte)' : !f ? 'Rand van de sleutel niet gevonden' :
+    `Lijn ${fitWord(f.avg)}: gemiddeld ${f.avg.toFixed(2)} mm afwijking`;
+}
+// zoek per inkeping de positie en diepte waarbij de lijn het best past
+$('fitBtn').onclick=()=>{
+  const k=ppm(); if(!S.img||!isFree()) return;
+  if(!k){ toast('Stel eerst de schaal in'); return; }
+  if(!S.marks.length){ toast('Zoek of plaats eerst inkepingen'); return; }
+  const col=keyColors(); if(!col){ toast('Sleutel niet gevonden. Staan de lijnen goed?'); return; }
+  const h=S.bottomY-S.topY, mid=(S.topY+S.bottomY)/2, t=runPerDepth();
+  const cache=new Map(); const edge=x=>{ x=Math.round(x); if(!cache.has(x)) cache.set(x,edgeAt(x,col.key,col.bg,S.topY-h*0.25,mid)); return cache.get(x); };
+  sortMarks();
+  const maxD=(h/k)*0.6, dStep=S.tpl.raster?S.tpl.step:0.02;
+  S.marks.forEach((m,i)=>{
+    const others=S.marks.filter((_,j)=>j!==i).map(o=>({pos:(o.x-S.shoulderX)/k, depth:(o.y-S.topY)/k}));
+    const p0=(m.x-S.shoulderX)/k; let best=null;
+    for(let dp=-0.5; dp<=0.5001; dp+=0.05){
+      const d0=(m.y-S.topY)/k, dLo=S.tpl.raster?Math.max(0,depthOfLevel(codeOf(Math.max(0,d0))-3)):Math.max(0,d0-0.6), dHi=Math.min(maxD,d0+0.6);
+      for(let d=dLo; d<=dHi+1e-6; d+=dStep){
+        if(d<0) continue;
+        const rows=others.concat([{pos:p0+dp, depth:d}]);
+        const w=S.tpl.flat/2+d*t+0.15; let s=0,n=0;
+        for(let xm=p0+dp-w; xm<=p0+dp+w; xm+=1/k){ const e=edge(S.shoulderX+xm*k); if(e==null) continue; s+=Math.abs((e-S.topY)/k - tplDepth(xm,rows)); n++; }
+        if(n>3){ const sc=s/n; if(!best||sc<best.sc) best={sc,pos:p0+dp,d}; }
+      }
+    }
+    if(best){ m.x=S.shoulderX+best.pos*k; m.y=S.topY+best.d*k; }
+  });
+  sortMarks(); render(); compute();
+  toast(S.fit ? 'Lijn passend gemaakt: '+fitWord(S.fit.avg) : 'Klaar');
+};
+
+// ---------- image ----------
+function loadFile(f){
+  if(!f) return;
+  const url = URL.createObjectURL(f);
+  const im = new Image();
+  im.onload = ()=>{
+    const m = 2200, sc = Math.min(1, m/Math.max(im.naturalWidth, im.naturalHeight));
+    const c = document.createElement('canvas'); c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc);
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+    URL.revokeObjectURL(url);
+    S.img=c; S.rot90 = c.height>c.width ? 1 : 0; S.fine=0; $('fine').value=0; $('fineVal').textContent='0°'; S.mirror=false;
+    S.zoom=1; S.panX=S.panY=0;
+    $('work').style.display='block';
+    buildRot(true);
+    resize();
+    $('work').scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  im.onerror=()=>toast('Kon de foto niet openen');
+  im.src=url;
+}
+$('fileCam').addEventListener('change',e=>{loadFile(e.target.files[0]); e.target.value='';});
+$('fileGal').addEventListener('change',e=>{loadFile(e.target.files[0]); e.target.value='';});
+
+function buildRot(resetGuides){
+  const im=S.img; if(!im) return;
+  const fr = S.RW ? {sx:S.shoulderX/S.RW, ty:S.topY/S.RH, by:S.bottomY/S.RH,
+    cuts:S.cuts.map(y=>y==null?null:y/S.RH), marks:S.marks.map(m=>({x:m.x/S.RW,y:m.y/S.RH})),
+    ref:S.ref.map(r=>({x:r.x/S.RW,y:r.y/S.RH})), tip:S.tipX==null?null:S.tipX/S.RW} : null;
+  const a = (S.rot90*90 + S.fine)*Math.PI/180;
+  const w=im.width, h=im.height, c=Math.abs(Math.cos(a)), s=Math.abs(Math.sin(a));
+  const RW=Math.round(w*c+h*s), RH=Math.round(w*s+h*c);
+  rot.width=RW; rot.height=RH;
+  rctx.clearRect(0,0,RW,RH);
+  rctx.save(); rctx.translate(RW/2,RH/2); rctx.rotate(a); rctx.scale(S.mirror?-1:1,1); rctx.drawImage(im,-w/2,-h/2); rctx.restore();
+  S.RW=RW; S.RH=RH;
+  S.pix = rctx.getImageData(0,0,RW,RH).data;
+  if (resetGuides || !fr){
+    S.shoulderX=RW*0.3; S.topY=RH*0.42; S.bottomY=RH*0.56;
+    S.cuts = new Array(isFree()?0:P().cuts).fill(null);
+    S.marks=[]; S.tipX=null;
+    S.ref=[{x:RW*0.3,y:RH*0.75},{x:RW*0.5,y:RH*0.75}];
+    if(!validSel()) S.sel='shoulder';
+  } else {
+    S.shoulderX=fr.sx*RW; S.topY=fr.ty*RH; S.bottomY=fr.by*RH; S.cuts=fr.cuts.map(f=>f==null?null:f*RH);
+    S.marks=fr.marks.map(m=>({x:m.x*RW,y:m.y*RH})); S.ref=fr.ref.map(r=>({x:r.x*RW,y:r.y*RH})); S.tipX=fr.tip==null?null:fr.tip*RW;
+  }
+  buildChips(); render(); compute();
+}
+
+function resize(){
+  const wrap=$('wrap'); dpr=window.devicePixelRatio||1;
+  cssW=wrap.clientWidth; cssH=Math.round(Math.min(window.innerHeight*0.62, Math.max(300, cssW*0.95)));
+  cv.style.height=cssH+'px'; cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+  render();
+}
+window.addEventListener('resize', ()=>{ if(S.img) resize(); });
+
+// view transform
+function scale(){ return Math.min(cssW/S.RW, cssH/S.RH)*S.zoom; }
+function origin(){ const s=scale(); return [(cssW-S.RW*s)/2+S.panX, (cssH-S.RH*s)/2+S.panY]; }
+function toScreen(x,y){ const s=scale(),[ox,oy]=origin(); return [x*s+ox, y*s+oy]; }
+function toWorld(x,y){ const s=scale(),[ox,oy]=origin(); return [(x-ox)/s, (y-oy)/s]; }
+
+function ppm(){
+  if(isFree()){
+    if(S.cal.mode==='blade'){ return S.cal.blade ? (S.bottomY-S.topY)/S.cal.blade : null; }
+    const d=Math.hypot(S.ref[1].x-S.ref[0].x,S.ref[1].y-S.ref[0].y);
+    return (d>3 && S.cal.refLen>0) ? d/S.cal.refLen : null;
+  }
+  return (S.bottomY-S.topY)/P().blade;
+}
+function cutX(i){ const p=P(); return S.shoulderX + (p.first + i*p.spacing)*ppm(); }
+function defaultCutY(){ return S.topY + (S.bottomY-S.topY)*0.25; }
+function depthOfCode(c){ const p=P(); return p.d0 - (c-p.min)*p.inc; }
+
+// ---------- render ----------
+function render(){
+  if(!S.img||!cssW) return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#0b0c0e'; ctx.fillRect(0,0,cssW,cssH);
+  const s=scale(), [ox,oy]=origin();
+  ctx.imageSmoothingEnabled = S.zoom<3;
+  ctx.drawImage(rot, ox, oy, S.RW*s, S.RH*s);
+  const [,ty]=toScreen(0,S.topY), [,by]=toScreen(0,S.bottomY), [sx]=toScreen(S.shoulderX,0);
+  const h=by-ty;
+  line(0,ty,cssW,ty,'#f3e04f',2); line(0,by,cssW,by,'#4fd1e8',2); line(sx,0,sx,cssH,'#ef5da8',2);
+  handle(cssW-22,ty,'#f3e04f'); handle(cssW-22,by,'#4fd1e8'); handle(sx,cssH-22,'#ef5da8');
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(isFree()) renderFree(ty,by,h); else renderFixed(ty,by,h,s);
+  // selection highlight
+  const sl=S.sel;
+  ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+  if(sl==='top'||sl==='bottom'){ const yy=sl==='top'?ty:by; ctx.strokeRect(-2,yy-6,cssW+4,12); }
+  else if(sl==='shoulder'){ ctx.strokeRect(sx-6,-2,12,cssH+4); }
+  else { const pt=selPoint(); if(pt){ const [a,b]=toScreen(pt.x,pt.y); ctx.beginPath(); ctx.arc(a,b,16,0,Math.PI*2); ctx.stroke(); } }
+  ctx.restore();
+}
+function renderFixed(ty,by,h,s){
+  const p=P();
+  if (h<=8) return;
+  for(let i=0;i<p.cuts;i++){
+    const [cx]=toScreen(cutX(i),0);
+    ctx.setLineDash([4,4]); line(cx,ty-h*0.4,cx,by,'rgba(232,181,74,.65)',1); ctx.setLineDash([]);
+    for(let c=p.min;c<=p.max;c++){ const yy = by - depthOfCode(c)*ppm()*s; line(cx-5,yy,cx+5,yy,'rgba(255,255,255,.35)',1); }
+    const wy = S.cuts[i]!=null ? S.cuts[i] : defaultCutY();
+    const [,cy]=toScreen(0,wy);
+    line(cx-14,cy,cx+14,cy,'#e8b54a',2.5);
+    dot(cx,cy,S.cuts[i]!=null?'rgba(232,181,74,.9)':'rgba(232,181,74,.35)', i+1);
+    if (S.cuts[i]!=null){
+      const r = codeFor(wy);
+      ctx.font='700 14px "JetBrains Mono",monospace'; ctx.fillStyle = r.sure?'#5fd38d':'#ff9f43';
+      ctx.fillText(r.code, cx, ty-h*0.4-10);
+    }
+  }
+}
+function renderFree(ty,by,h){
+  const k=ppm();
+  if(S.cal.mode==='ref'){
+    const [a1,b1]=toScreen(S.ref[0].x,S.ref[0].y), [a2,b2]=toScreen(S.ref[1].x,S.ref[1].y);
+    line(a1,b1,a2,b2,'#6be36b',2);
+    for(const [a,b,n] of [[a1,b1,'1'],[a2,b2,'2']]){
+      line(a,b-12,a,b+12,'#6be36b',2);
+      ctx.beginPath(); ctx.arc(a,b,7,0,Math.PI*2); ctx.fillStyle='rgba(107,227,107,.85)'; ctx.fill(); ctx.strokeStyle='#0b0c0e'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.fillStyle='#0b0c0e'; ctx.font='700 9px Inter,sans-serif'; ctx.fillText(n,a,b+.5);
+    }
+    ctx.font='700 12px Inter,sans-serif'; ctx.fillStyle='#6be36b'; ctx.fillText(S.cal.refLen+' mm',(a1+a2)/2,(b1+b2)/2-14);
+  }
+  if(S.tipX!=null){ const [tx]=toScreen(S.tipX,0); ctx.setLineDash([3,5]); line(tx,ty-10,tx,by+10,'rgba(255,255,255,.5)',1); ctx.setLineDash([]); }
+  if(k && S.tpl.show && S.marks.length){
+    const rows=freeRows(), end=S.tipX!=null?(S.tipX-S.shoulderX)/k:tplEnd(rows)+1.5;
+    ctx.beginPath(); let first=true;
+    const [sx0]=toScreen(S.shoulderX,0), [sx1]=toScreen(S.shoulderX+end*k,0);
+    for(let X=Math.max(0,sx0); X<=Math.min(cssW,sx1); X+=1){
+      const xm=(toWorld(X,0)[0]-S.shoulderX)/k, [,Y]=toScreen(0,S.topY+tplDepth(xm,rows)*k);
+      if(first){ctx.moveTo(X,Y); first=false;} else ctx.lineTo(X,Y);
+    }
+    ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.lineWidth=4; ctx.stroke();
+    ctx.strokeStyle=fitColor(S.fit&&S.fit.avg)==='#555'?'#ff4fd8':fitColor(S.fit.avg); ctx.lineWidth=2; ctx.stroke();
+  }
+  S.marks.forEach((m,i)=>{
+    const [cx,cy]=toScreen(m.x,m.y);
+    if(k && S.tpl.raster){
+      const s=scale(), maxL=Math.floor((S.bottomY-S.topY)/k*0.6/S.tpl.step);
+      for(let L=0; L<=maxL; L++){ const yy=ty+L*S.tpl.step*k*s; line(cx-6,yy,cx+6,yy,'rgba(255,255,255,.4)',1); }
+    }
+    ctx.setLineDash([3,4]); line(cx,ty,cx,cy,'rgba(232,181,74,.8)',1); ctx.setLineDash([]);
+    line(cx-12,cy,cx+12,cy,'#e8b54a',2.5);
+    dot(cx,cy,S.tpl.show?'rgba(232,181,74,.55)':'rgba(232,181,74,.92)',i+1);
+    if(k){
+      ctx.font='700 12px "JetBrains Mono",monospace'; ctx.fillStyle='#5fd38d';
+      const dmm=(m.y-S.topY)/k; ctx.fillText(S.tpl.raster?String(codeOf(dmm)):dmm.toFixed(2), cx, ty-12-(i%2)*14);
+    }
+  });
+}
+function line(x1,y1,x2,y2,c,w){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.strokeStyle=c; ctx.lineWidth=w; ctx.stroke(); }
+function handle(x,y,c){ ctx.beginPath(); ctx.arc(x,y,8,0,Math.PI*2); ctx.fillStyle=c; ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle='#0b0c0e'; ctx.stroke(); }
+function dot(x,y,c,n){ ctx.beginPath(); ctx.arc(x,y,9,0,Math.PI*2); ctx.fillStyle=c; ctx.fill(); ctx.lineWidth=1.5; ctx.strokeStyle='#1a1405'; ctx.stroke(); ctx.fillStyle='#1a1405'; ctx.font='700 11px Inter,sans-serif'; ctx.fillText(n,x,y+.5); }
+
+function codeFor(yWorld){
+  const p=P(), d=(S.bottomY-yWorld)/ppm();
+  let c=Math.round((p.d0-d)/p.inc)+p.min; c=Math.max(p.min,Math.min(p.max,c));
+  const err=d-depthOfCode(c);
+  return {code:c, mm:d, err, sure:Math.abs(err)<=p.inc*0.35};
+}
+
+// ---------- selection helpers ----------
+function validSel(){
+  const k=S.sel; if(['shoulder','top','bottom'].includes(k)) return true;
+  if(k==='r0'||k==='r1') return isFree()&&S.cal.mode==='ref';
+  if(k.startsWith('m')) return isFree() && +k.slice(1)<S.marks.length;
+  if(k.startsWith('cut')) return !isFree() && +k.slice(3)<P().cuts;
+  return false;
+}
+function selPoint(){
+  const k=S.sel;
+  if(k==='r0'||k==='r1') return isFree()&&S.cal.mode==='ref' ? S.ref[+k[1]] : null;
+  if(k.startsWith('m')) return S.marks[+k.slice(1)]||null;
+  if(k.startsWith('cut') && !isFree()){ const i=+k.slice(3); if(i>=P().cuts||!ppm()) return null; return {x:cutX(i), y:S.cuts[i]!=null?S.cuts[i]:defaultCutY()}; }
+  return null;
+}
+
+// ---------- interaction ----------
+const ptrs=new Map(); let drag=null, pinch=null;
+function hit(x,y){
+  if(!S.img) return null;
+  const [,ty]=toScreen(0,S.topY), [,by]=toScreen(0,S.bottomY), [sx]=toScreen(S.shoulderX,0);
+  let best=null, bd=26;
+  const consider=(px,py,k)=>{ const d=Math.hypot(x-px,y-py); if(d<bd){bd=d;best=k;} };
+  if(isFree()){
+    S.marks.forEach((m,i)=>{ const [a,b]=toScreen(m.x,m.y); consider(a,b,'m'+i); });
+    if(S.cal.mode==='ref') S.ref.forEach((r,i)=>{ const [a,b]=toScreen(r.x,r.y); consider(a,b,'r'+i); });
+  } else if (by-ty>8){
+    for(let i=0;i<P().cuts;i++){ const [cx]=toScreen(cutX(i),0); const [,cy]=toScreen(0,S.cuts[i]!=null?S.cuts[i]:defaultCutY()); consider(cx,cy,'cut'+i); }
+  }
+  if(best) return best;
+  const cands=[['top',Math.abs(y-ty)],['bottom',Math.abs(y-by)],['shoulder',Math.abs(x-sx)]].sort((a,b)=>a[1]-b[1]);
+  if(cands[0][1]<20) return cands[0][0];
+  return null;
+}
+function pos(e){ const r=cv.getBoundingClientRect(); return [e.clientX-r.left, e.clientY-r.top]; }
+cv.addEventListener('pointerdown',e=>{
+  if(!S.img) return;
+  cv.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId,pos(e));
+  if(ptrs.size===2){
+    drag=null; hideLoupe();
+    const [a,b]=[...ptrs.values()];
+    pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]), z:S.zoom, w:toWorld((a[0]+b[0])/2,(a[1]+b[1])/2)};
+    return;
+  }
+  const [x,y]=pos(e); const h=hit(x,y);
+  if(h){ drag={k:h}; select(h); applyDrag(x,y); showLoupe(x,y); }
+  else drag={k:'pan', x, y, px:S.panX, py:S.panY};
+});
+cv.addEventListener('pointermove',e=>{
+  if(!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId,pos(e));
+  if(pinch && ptrs.size>=2){
+    const [a,b]=[...ptrs.values()];
+    const d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+    S.zoom=Math.max(1,Math.min(14,pinch.z*d/pinch.d));
+    const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    S.panX=0;S.panY=0; const [sx,sy]=toScreen(pinch.w[0],pinch.w[1]); S.panX=mid[0]-sx; S.panY=mid[1]-sy;
+    render(); return;
+  }
+  if(!drag) return;
+  const [x,y]=pos(e);
+  if(drag.k==='pan'){ if(S.zoom>1){ S.panX=drag.px+(x-drag.x); S.panY=drag.py+(y-drag.y); render(); } return; }
+  applyDrag(x,y); showLoupe(x,y);
+});
+function endPtr(e){ ptrs.delete(e.pointerId); if(ptrs.size<2) pinch=null; if(ptrs.size===0){ if(drag&&drag.k!=='pan'){ if(S.tpl.raster&&drag.k.startsWith('m')){ const m=S.marks[+drag.k.slice(1)]; if(m) snapMark(m); render(); } sortMarks(); compute(); } drag=null; hideLoupe(); } }
+cv.addEventListener('pointerup',endPtr); cv.addEventListener('pointercancel',endPtr);
+
+function clampMarkY(y){ const h=S.bottomY-S.topY; return Math.max(S.topY-h*0.3, Math.min(S.bottomY,y)); }
+function applyDrag(x,y){
+  const [wx,wy]=toWorld(x,y), k=drag.k;
+  if(k==='top') S.topY=Math.min(wy,S.bottomY-5);
+  else if(k==='bottom') S.bottomY=Math.max(wy,S.topY+5);
+  else if(k==='shoulder') S.shoulderX=wx;
+  else if(k.startsWith('cut')) S.cuts[+k.slice(3)]=clampMarkY(wy);
+  else if(k.startsWith('m')){ const m=S.marks[+k.slice(1)]; if(m){ m.x=wx; m.y=clampMarkY(wy); } }
+  else if(k==='r0'||k==='r1'){ S.ref[+k[1]]={x:wx,y:wy}; }
+  render();
+}
+function sortMarks(){
+  if(!S.marks.length) return;
+  const cur = S.sel.startsWith('m') ? S.marks[+S.sel.slice(1)] : null;
+  S.marks.sort((a,b)=>a.x-b.x);
+  if(cur) S.sel='m'+S.marks.indexOf(cur);
+  buildChips();
+}
+function showLoupe(x,y){
+  loupe.style.display='block';
+  loupe.style.left = x < cssW/2 ? (cssW-140)+'px' : '8px';
+  const L=260, src=36*dpr;
+  lctx.fillStyle='#000'; lctx.fillRect(0,0,L,L);
+  lctx.imageSmoothingEnabled=false;
+  lctx.drawImage(cv, x*dpr-src, y*dpr-src, src*2, src*2, 0,0,L,L);
+  lctx.strokeStyle='rgba(255,255,255,.8)'; lctx.lineWidth=1.5;
+  lctx.beginPath(); lctx.moveTo(L/2,L/2-24); lctx.lineTo(L/2,L/2+24); lctx.moveTo(L/2-24,L/2); lctx.lineTo(L/2+24,L/2); lctx.stroke();
+}
+function hideLoupe(){ loupe.style.display='none'; }
+
+function zoomBy(f){ const c=toWorld(cssW/2,cssH/2); S.zoom=Math.max(1,Math.min(14,S.zoom*f)); S.panX=0;S.panY=0; const [sx,sy]=toScreen(c[0],c[1]); S.panX=cssW/2-sx; S.panY=cssH/2-sy; if(S.zoom===1){S.panX=0;S.panY=0;} render(); }
+$('zoomIn').onclick=()=>zoomBy(1.5); $('zoomOut').onclick=()=>zoomBy(1/1.5);
+$('zoomReset').onclick=()=>{S.zoom=1;S.panX=0;S.panY=0;render();};
+$('rotL').onclick=()=>{S.rot90=(S.rot90+3)%4; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
+$('rotR').onclick=()=>{S.rot90=(S.rot90+1)%4; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
+$('mirror').onclick=()=>{S.mirror=!S.mirror; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
+let fineT=null;
+$('fine').addEventListener('input',e=>{ S.fine=+e.target.value; $('fineVal').textContent=S.fine.toFixed(1)+'°'; clearTimeout(fineT); fineT=setTimeout(()=>buildRot(false),40); });
+
+// ---------- sides ----------
+document.querySelectorAll('#sideSeg button').forEach(b=>b.onclick=()=>{
+  const ns=b.dataset.s; if(ns===S.side) return;
+  const cur=freeRows(); if(cur.length) S.frozen[S.side]=cur;
+  S.side=ns; S.marks=[]; S.tipX=null; if(S.sel.startsWith('m')) S.sel='shoulder';
+  document.querySelectorAll('#sideSeg button').forEach(x=>x.classList.toggle('on',x.dataset.s===ns));
+  buildChips(); render(); compute();
+  toast(S.frozen[ns] ? 'Kant '+ns+' is al gemeten. Opnieuw meten overschrijft hem.' : 'Draai de foto 180° (2× ↻) en meet kant '+ns);
+});
+
+// ---------- manual buttons ----------
+function buildChips(){
+  const box=$('chips'); box.innerHTML='';
+  const items=[['shoulder','Schouder','#ef5da8'],['top','Bovenkant','#f3e04f'],['bottom','Onderkant','#4fd1e8']];
+  if(isFree()){
+    if(S.cal.mode==='ref') items.push(['r0','Liniaal punt 1','#6be36b'],['r1','Liniaal punt 2','#6be36b']);
+    S.marks.forEach((m,i)=>items.push(['m'+i,'Inkeping '+(i+1),'#e8b54a']));
+  } else for(let i=0;i<P().cuts;i++) items.push(['cut'+i,'Inkeping '+(i+1),'#e8b54a']);
+  if(!validSel()) S.sel='shoulder';
+  items.forEach(([k,l,c])=>{
+    const b=document.createElement('button'); b.className='chip'+(S.sel===k?' on':''); b.style.setProperty('--c',c);
+    b.innerHTML='<i></i>'; b.appendChild(document.createTextNode(l)); b.onclick=()=>select(k); b.dataset.k=k; box.appendChild(b);
+  });
+  updateArrows();
+}
+function select(k){
+  S.sel=k;
+  document.querySelectorAll('#chips .chip').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  updateArrows(); render();
+}
+function updateArrows(){
+  const k=S.sel, horizOnly = k==='shoulder', vertOnly = k==='top'||k==='bottom'||k.startsWith('cut');
+  document.querySelectorAll('.arrow[data-dx]').forEach(b=>{ b.disabled = horizOnly ? b.dataset.dx==='0' : vertOnly ? b.dataset.dy==='0' : false; });
+  $('snapBtn').disabled = !k.startsWith('cut');
+  $('delMark').disabled = !k.startsWith('m');
+}
+function nudge(dx,dy){
+  if(!S.img) return;
+  const st=(S.fineStep?0.5:5)/scale(), k=S.sel;
+  if(k==='shoulder') S.shoulderX+=dx*st;
+  else if(k==='top') S.topY=Math.min(S.topY+dy*st,S.bottomY-5);
+  else if(k==='bottom') S.bottomY=Math.max(S.bottomY+dy*st,S.topY+5);
+  else if(k.startsWith('cut')){ const i=+k.slice(3); const cur=S.cuts[i]!=null?S.cuts[i]:defaultCutY(); S.cuts[i]=clampMarkY(cur+dy*st); }
+  else if(k.startsWith('m')){ const m=S.marks[+k.slice(1)]; if(m){ m.x+=dx*st;
+      if(dy && S.tpl.raster && ppm()){ const kk=ppm(), c=codeOf(Math.max(0,(m.y-S.topY)/kk))+dy; if(depthOfLevel(c)>=0) m.y=clampMarkY(S.topY+depthOfLevel(c)*kk); }
+      else m.y=clampMarkY(m.y+dy*st); } }
+  else if(k==='r0'||k==='r1'){ const r=S.ref[+k[1]]; r.x+=dx*st; r.y+=dy*st; }
+  render(); compute();
+}
+let rep=null, repT=null;
+function stopRep(){ clearTimeout(repT); clearInterval(rep); rep=repT=null; }
+document.querySelectorAll('.arrow[data-dx]').forEach(b=>{
+  const dx=+b.dataset.dx, dy=+b.dataset.dy;
+  b.addEventListener('pointerdown',e=>{ e.preventDefault(); if(b.disabled) return; nudge(dx,dy); stopRep(); repT=setTimeout(()=>{ rep=setInterval(()=>nudge(dx,dy),45); },350); });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>{ const was=rep||repT; stopRep(); if(was&&S.sel.startsWith('m')) sortMarks(); }));
+  b.addEventListener('contextmenu',e=>e.preventDefault());
+});
+$('stepBtn').onclick=()=>{ S.fineStep=!S.fineStep; $('stepBtn').textContent=S.fineStep?'Fijn':'Grof'; };
+$('nextBtn').onclick=()=>{ const ks=[...document.querySelectorAll('#chips .chip')].map(b=>b.dataset.k); select(ks[(ks.indexOf(S.sel)+1)%ks.length]); };
+$('snapBtn').onclick=()=>{
+  if(!S.sel.startsWith('cut')) return; const i=+S.sel.slice(3);
+  const y=S.cuts[i]!=null?S.cuts[i]:defaultCutY(); const r=codeFor(y);
+  S.cuts[i]=S.bottomY-depthOfCode(r.code)*ppm(); render(); compute();
+};
+$('addMark').onclick=()=>{
+  if(!S.img) return;
+  const h=S.bottomY-S.topY; let x;
+  if(S.marks.length>=2){ const l=S.marks[S.marks.length-1], p=S.marks[S.marks.length-2]; x=l.x+(l.x-p.x); }
+  else if(S.marks.length===1) x=S.marks[0].x+h*0.45;
+  else x=S.shoulderX+h*0.4;
+  const [vx]=toWorld(cssW-30,0); if(x>vx && S.zoom>1) x=toWorld(cssW/2,0)[0];
+  S.marks.push({x, y:S.topY+h*0.25}); S.sel='m'+(S.marks.length-1);
+  buildChips(); render(); compute();
+};
+$('delMark').onclick=()=>{
+  if(!S.sel.startsWith('m')) return; S.marks.splice(+S.sel.slice(1),1);
+  S.sel = S.marks.length ? 'm'+Math.min(+S.sel.slice(1),S.marks.length-1) : 'shoulder';
+  buildChips(); render(); compute();
+};
+
+// ---------- auto measure ----------
+function px(x,y){ x=Math.round(x); y=Math.round(y); if(x<0||y<0||x>=S.RW||y>=S.RH) return null; const k=(y*S.RW+x)*4, d=S.pix; return d[k+3]<20?null:[d[k],d[k+1],d[k+2]]; }
+function avg(x,y,r){ let n=0,a=[0,0,0]; for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const c=px(x+dx,y+dy); if(c){a[0]+=c[0];a[1]+=c[1];a[2]+=c[2];n++;}} return n?a.map(v=>v/n):null; }
+function dist(a,b){ return Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]); }
+function edgeAt(x,key,bg,yFrom,yTo){
+  let run=0;
+  for(let y=Math.round(yFrom); y<=yTo; y++){
+    const c=px(x,y); const isKey = c && dist(c,key)<dist(c,bg);
+    run = isKey ? run+1 : 0;
+    if(run>=3) return y-2;
+  }
+  return null;
+}
+$('auto').onclick=()=>{
+  if(!S.img) return;
+  const h=S.bottomY-S.topY;
+  if(h<15){ toast('Zet eerst de gele en blauwe lijn op het blad'); return; }
+  if(isFree()) autoFree(); else autoFixed();
+};
+function autoFixed(){
+  const p=P(), h=S.bottomY-S.topY, r=Math.max(1,Math.round(h*0.03)); let low=false, miss=0;
+  for(let i=0;i<p.cuts;i++){
+    const cx=cutX(i);
+    const key=avg(cx, S.bottomY-h*0.2, r), bg=avg(cx, S.topY-h*0.45, r) || avg(cx, S.topY-h*0.25, r);
+    if(!key||!bg){ miss++; continue; }
+    if(dist(key,bg)<35) low=true;
+    const half=Math.max(1,Math.round(0.25*ppm())), edges=[];
+    for(let x=cx-half;x<=cx+half;x++){ const e=edgeAt(x,key,bg,S.topY-h*0.2,S.bottomY-h*0.2); if(e!=null) edges.push(e); }
+    if(edges.length){ edges.sort((a,b)=>a-b); S.cuts[i]=edges[Math.floor(edges.length/2)]; } else miss++;
+  }
+  render(); compute();
+  toast(low?'Weinig contrast. Leg de sleutel op wit papier of sleep zelf bij.':miss?miss+' inkeping(en) niet gevonden. Sleep die zelf.':'Gemeten. Controleer de bolletjes.');
+}
+function autoFree(){
+  const h=S.bottomY-S.topY, mid=(S.topY+S.bottomY)/2, r=Math.max(1,Math.round(h*0.04));
+  const sx=S.shoulderX+h*0.35;
+  const key=avg(sx, S.bottomY-h*0.25, r), bg=avg(sx, S.topY-h*0.6, r)||avg(sx,S.topY-h*0.3,r);
+  if(!key||!bg){ toast('Kon de sleutel niet vinden. Staan de lijnen goed?'); return; }
+  if(dist(key,bg)<35){ toast('Weinig contrast. Leg de sleutel op wit papier, of voeg inkepingen zelf toe.'); }
+  const isKey=(x,y)=>{ const c=px(x,y); return c && dist(c,key)<dist(c,bg); };
+  // find tip along lower part of blade
+  const ly=mid; let x=Math.round(S.shoulderX+2), gap=0, tip=x;
+  while(x<S.RW-1){ if(isKey(x,ly)){ tip=x; gap=0; } else if(++gap>Math.max(4,h*0.08)) break; x++; }
+  S.tipX=tip;
+  // edge profile
+  const x0=Math.round(S.shoulderX+2), x1=Math.round(tip-h*0.7);
+  if(x1-x0<h*0.5){ toast('Blad te kort gevonden. Controleer de roze lijn.'); return; }
+  const prof=[];
+  for(let x=x0;x<=x1;x++){ const e=edgeAt(x,key,bg,S.topY-h*0.25,mid); prof.push(e==null?null:e-S.topY); }
+  // fill gaps + median smooth
+  for(let i=0;i<prof.length;i++) if(prof[i]==null) prof[i]= i? prof[i-1] : 0;
+  const sm=prof.map((v,i)=>{ const w=prof.slice(Math.max(0,i-2),i+3).sort((a,b)=>a-b); return w[Math.floor(w.length/2)]; });
+  const w=Math.max(3,Math.round(h*0.14)), minD=h*0.025, prom=h*0.025;
+  const found=[];
+  for(let i=0;i<sm.length;i++){
+    const v=sm[i]; if(v<minD) continue;
+    let isMax=true; for(let j=Math.max(0,i-w);j<=Math.min(sm.length-1,i+w);j++) if(sm[j]>v){isMax=false;break;}
+    if(!isMax) continue;
+    // plateau extent
+    let a=i,b=i; while(a>0&&sm[a-1]>=v-1) a--; while(b<sm.length-1&&sm[b+1]>=v-1) b++;
+    let lmin=v,rmin=v; for(let j=Math.max(0,a-3*w);j<a;j++) lmin=Math.min(lmin,sm[j]); for(let j=b+1;j<=Math.min(sm.length-1,b+3*w);j++) rmin=Math.min(rmin,sm[j]);
+    if(a===0) lmin=0;
+    if(b>=sm.length-2) continue; // helling naar de punt
+    if(v-Math.max(lmin,rmin)<prom) continue;
+    const c=(a+b)/2;
+    if(found.length && c-found[found.length-1].c < w){ continue; }
+    found.push({c, v}); i=b;
+  }
+  S.marks=found.map(f=>({x:x0+f.c, y:S.topY+f.v})); if(S.tpl.raster) snapAll();
+  S.sel=S.marks.length?'m0':'shoulder';
+  buildChips(); render(); compute();
+  toast(S.marks.length? S.marks.length+' inkepingen gevonden. Controleer ze en verwijder of voeg toe waar nodig.' : 'Geen inkepingen gevonden. Voeg ze zelf toe met + Inkeping.');
+}
+
+// ---------- result ----------
+function freeRows(){
+  const k=ppm(); if(!k) return [];
+  return S.marks.slice().sort((a,b)=>a.x-b.x).map(m=>({pos:(m.x-S.shoulderX)/k, depth:(m.y-S.topY)/k, height:(S.bottomY-m.y)/k}));
+}
+function sideData(s){ if(s===S.side){ const r=freeRows(); return r.length?r:S.frozen[s]; } return S.frozen[s]; }
+function compute(){
+  if(isFree()) computeFree(); else computeFixed();
+}
+function computeFixed(){
+  const p=P();
+  $('sketch').classList.add('hidden');
+  const anySet=S.cuts.some(v=>v!=null);
+  $('result').classList.toggle('hidden', !S.img || !anySet);
+  if(!anySet) return;
+  $('resTitle').textContent='Je sleutelcode';
+  $('cutHead').innerHTML='<tr><th>#</th><th>Code</th><th>Gemeten hoogte</th><th>Zekerheid</th></tr>';
+  const rows=[], codes=[];
+  for(let i=0;i<p.cuts;i++){
+    if(S.cuts[i]==null){ codes.push('?'); rows.push(`<tr><td>${i+1}</td><td class="mono">?</td><td>—</td><td class="warn">niet gemeten</td></tr>`); continue; }
+    const r=codeFor(S.cuts[i]); codes.push(String(r.code));
+    rows.push(`<tr><td>${i+1}</td><td class="mono">${r.code}</td><td class="mono">${r.mm.toFixed(2)} mm</td><td class="${r.sure?'ok':'warn'}">${r.sure?'goed':'twijfel ('+(r.err>0?'+':'')+r.err.toFixed(2)+')'}</td></tr>`);
+  }
+  $('cutTable').innerHTML=rows.join('');
+  $('codeOut').className='code'; $('codeOut').textContent=codes.join(' ');
+  $('codeSub').textContent=p.name+' · van schouder naar punt';
+  $('resNote').textContent='Gemeten vanaf een foto, dus een schatting. Bij oranje waarden ligt de meting tussen twee codes in. Neem dan liever ook de sleutel zelf mee.';
+}
+function computeFree(){
+  computeFit(); updateFitBar(); render(); try{ fillProf(); }catch(e){}
+  const k=ppm(), A=sideData('A'), B=sideData('B');
+  const has=(A&&A.length)||(B&&B.length);
+  $('result').classList.toggle('hidden', !S.img || !has);
+  if(!has) return;
+  $('resTitle').textContent='Maten van je sleutel';
+  const R=S.tpl.raster;
+  $('cutHead').innerHTML='<tr><th>#</th><th>Vanaf schouder</th><th>Diepte</th><th>'+(R?'Code':'Pasvorm')+'</th></tr>';
+  const rows=[];
+  for(const s of ['A','B']){
+    const d=sideData(s); if(!d||!d.length) continue;
+    if(B&&B.length) rows.push(`<tr class="sidehead"><td colspan="4">Kant ${s}</td></tr>`);
+    d.forEach((r,i)=>{
+      let last;
+      if(R) last=`<td class="mono" style="color:var(--brass);font-weight:700">${codeOf(r.depth)}</td>`;
+      else { const f = s===S.side && S.fit ? S.fit.per[i] : null; last = f==null?'<td>—</td>':`<td style="color:${fitColor(f)}">${f.toFixed(2)}</td>`; }
+      rows.push(`<tr><td>${i+1}</td><td class="mono">${r.pos.toFixed(2)} mm</td><td class="mono">${r.depth.toFixed(2)} mm</td>${last}</tr>`);
+    });
+  }
+  $('cutTable').innerHTML=rows.join('');
+  const fmt=d=> R ? d.map(r=>codeOf(r.depth)).join(' ') : d.map(r=>r.depth.toFixed(1)).join(' · ');
+  let big = A&&A.length ? fmt(A) : '';
+  if(B&&B.length) big = (big?'A: '+big+'\n':'')+'B: '+fmt(B);
+  $('codeOut').className='code small'; $('codeOut').style.whiteSpace='pre-line'; $('codeOut').textContent=big;
+  const bladeMm = k ? (S.bottomY-S.topY)/k : null;
+  const stamp=$('stamp').value.trim().toUpperCase();
+  $('codeSub').textContent=(stamp?'Code '+stamp+' · ':'')+(R?'code-standen (stap '+S.tpl.step.toFixed(2)+' mm)':'diepte per inkeping in mm')+(bladeMm?' · bladhoogte '+bladeMm.toFixed(2)+' mm':'');
+  $('resNote').innerHTML='<b>Controle:</b> meet de bladhoogte bij de schouder even na met een liniaal of schuifmaat. Klopt die, dan klopt de schaal. <b>Diepte</b> = hoe ver de inkeping onder de onbewerkte bovenkant ligt. <b>Restant</b> = hoeveel metaal er nog onder zit. Geef de sleutelmaker ook een foto van de zijkant van de sleutel (de lange groeven), zodat hij de juiste blanco sleutel kiest.';
+  drawSketch(A,B,bladeMm);
+}
+function drawSketch(A,B,bh){
+  const c=$('sketch'); if(!bh){ c.classList.add('hidden'); return; }
+  c.classList.remove('hidden');
+  const cw=c.clientWidth||600, chh=Math.round(cw*0.42), dp=window.devicePixelRatio||1;
+  c.width=cw*dp; c.height=chh*dp; const g=c.getContext('2d'); g.setTransform(dp,0,0,dp,0,0);
+  g.fillStyle='#f4f1ea'; g.fillRect(0,0,cw,chh);
+  const all=[...(A||[]),...(B||[])]; const lastPos=all.length?Math.max(...all.map(r=>r.pos)):5;
+  let L = S.tipX!=null && ppm() ? (S.tipX-S.shoulderX)/ppm()-bh*0.5 : lastPos+bh*0.5;
+  L=Math.max(L,lastPos+bh*0.3);
+  const total=L+bh*0.6+4;
+  const sc=Math.min((cw-40)/total,(chh-70)/bh), ox=30, oy=(chh-bh*sc)/2+6;
+  const X=mm=>ox+mm*sc, Y=mm=>oy+mm*sc, hf=0.25;
+  g.beginPath(); g.moveTo(X(-3),Y(-1.5)); g.lineTo(X(0),Y(-1.5)); g.lineTo(X(0),Y(0));
+  (A||[]).forEach(r=>{ g.lineTo(X(r.pos-hf-r.depth),Y(0)); g.lineTo(X(r.pos-hf),Y(r.depth)); g.lineTo(X(r.pos+hf),Y(r.depth)); g.lineTo(X(r.pos+hf+r.depth),Y(0)); });
+  g.lineTo(X(L),Y(0)); g.lineTo(X(L+bh*0.5),Y(bh/2)); g.lineTo(X(L),Y(bh));
+  (B||[]).slice().reverse().forEach(r=>{ g.lineTo(X(r.pos+hf+r.depth),Y(bh)); g.lineTo(X(r.pos+hf),Y(bh-r.depth)); g.lineTo(X(r.pos-hf),Y(bh-r.depth)); g.lineTo(X(r.pos-hf-r.depth),Y(bh)); });
+  g.lineTo(X(0),Y(bh)); g.lineTo(X(0),Y(bh+1.5)); g.lineTo(X(-3),Y(bh+1.5)); g.closePath();
+  g.fillStyle='#d9c48e'; g.fill(); g.strokeStyle='#4a3d1c'; g.lineWidth=1.2; g.stroke();
+  g.font='600 11px "JetBrains Mono",monospace'; g.textAlign='center'; g.fillStyle='#2b2410';
+  (A||[]).forEach((r,i)=>{ g.fillText(r.depth.toFixed(2),X(r.pos),Y(0)-8-(i%2)*12); });
+  g.textBaseline='top'; (B||[]).forEach((r,i)=>{ g.fillText(r.depth.toFixed(2),X(r.pos),Y(bh)+6+(i%2)*12); });
+  g.textBaseline='alphabetic'; g.textAlign='left'; g.fillStyle='#6b6250'; g.font='500 10px Inter,sans-serif';
+  g.fillText('schouder',X(0)+3,chh-6);
+  g.strokeStyle='#6b6250'; g.beginPath(); g.moveTo(cw-20-sc,chh-10); g.lineTo(cw-20,chh-10); g.stroke(); g.textAlign='right'; g.fillText('1 mm',cw-24-sc,chh-6);
+}
+
+function copyText(){
+  if(!isFree()) return P().name+': '+$('codeOut').textContent+' (van schouder naar punt)';
+  const k=ppm(), stamp=$('stamp').value.trim().toUpperCase(), lines=[];
+  lines.push('Sleutel, merk onbekend'+(stamp?' – code '+stamp:''));
+  if(k) lines.push('Bladhoogte bij schouder: '+((S.bottomY-S.topY)/k).toFixed(2)+' mm');
+  if(S.tpl.raster) lines.push('Code-raster: stap '+S.tpl.step.toFixed(2)+' mm, onbewerkt = '+S.tpl.zero);
+  lines.push('Per inkeping: positie vanaf schouder / diepte onder bovenkant'+(S.tpl.raster?' / code':''));
+  for(const s of ['A','B']){ const d=sideData(s); if(!d||!d.length) continue; lines.push('Kant '+s+':'); d.forEach((r,i)=>lines.push(`  ${i+1}: ${r.pos.toFixed(2)} mm / ${r.depth.toFixed(2)} mm`+(S.tpl.raster?' / '+codeOf(r.depth):''))); }
+  if(S.fit) lines.push('Pasvorm sjabloon: gem. '+S.fit.avg.toFixed(2)+' mm afwijking');
+  return lines.join('\n');
+}
+$('copy').onclick=()=>{
+  const t=copyText();
+  const fb=()=>{ const i=$('copyFallback'); i.classList.remove('hidden'); i.value=t; i.focus(); i.select(); toast('Selecteer en kopieer de tekst hieronder'); };
+  try{ clip(t).then(()=>toast('Gekopieerd'), fb); }catch(e){ fb(); }
+};
+$('save').onclick=()=>{
+  const name=$('saveName').value.trim()||'Sleutel';
+  const list=store.get('sc_saved',[]);
+  list.unshift({name, profile:isFree()?'Vrij gemeten':P().name, code:$('codeOut').textContent.replace(/\n/g,'  '), text:copyText(), date:new Date().toLocaleDateString('nl-NL')});
+  if(store.set('sc_saved',list)){ $('saveName').value=''; toast('Opgeslagen'); } else toast('Opslaan lukt niet in deze browser');
+  renderSaved();
+};
+function renderSaved(){
+  const list=store.get('sc_saved',[]), ul=$('savedList'); ul.innerHTML='';
+  $('savedEmpty').style.display=list.length?'none':'block';
+  list.forEach((k,idx)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="n"><b></b><small></small></div><span class="c"></span><button class="btn sm" data-a="copy" aria-label="Kopiëren">📋</button><button class="btn sm" data-a="del" aria-label="Verwijderen">✕</button>`;
+    li.querySelector('b').textContent=k.name; li.querySelector('small').textContent=k.profile+' · '+k.date; li.querySelector('.c').textContent=k.code;
+    li.querySelector('[data-a=del]').onclick=()=>{ const l=store.get('sc_saved',[]); l.splice(idx,1); store.set('sc_saved',l); renderSaved(); };
+    li.querySelector('[data-a=copy]').onclick=()=>{ const t=k.text||k.code; try{ clip(t).then(()=>toast('Gekopieerd'),()=>toast('Kopiëren lukt niet')); }catch(e){ toast('Kopiëren lukt niet'); } };
+    ul.appendChild(li);
+  });
+}
+let tt=null;
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),3200); }
+
+// =================== profiel, doorsnede & 3D ===================
+const PR = Object.assign({H:null,T:2.0,L:null,tip:3,bowL:14,bowH:16,hole:4,grooves:[]}, store.get('sc_prof',{}));
+let gSel=-1;
+function saveProf(){ store.set('sc_prof',PR); }
+function measuredH(){ const k=isFree()&&ppm(); return k ? (S.bottomY-S.topY)/k : null; }
+function measuredL(){
+  const k=isFree()&&ppm(); if(!k) return null;
+  if(S.tipX!=null) return Math.max(1,(S.tipX-S.shoulderX)/k - PR.tip);
+  const rows=[...(sideData('A')||[]),...(sideData('B')||[])]; return rows.length? tplEnd(rows)+1.5 : null;
+}
+function gH(){ return PR.H||measuredH()||6.5; }
+function gL(){ return PR.L||measuredL()||15; }
+const pf={pH:'H',pT:'T',pL:'L',pTip:'tip',pBowL:'bowL',pBowH:'bowH',pHole:'hole'};
+function fillProf(){
+  for(const id in pf){ const v=PR[pf[id]]; $(id).value = v==null?'':(+v).toFixed(2); }
+  const mh=measuredH(), ml=measuredL();
+  $('pH').placeholder = mh?'auto: '+mh.toFixed(2):'bv. 6.50';
+  $('pL').placeholder = ml?'auto: '+ml.toFixed(1):'bv. 15';
+}
+for(const id in pf) $(id).addEventListener('input',()=>{
+  const v=parseFloat($(id).value), key=pf[id];
+  if(!isFinite(v)){ if(key==='H'||key==='L'){ PR[key]=null; saveProf(); render2(); } return; }
+  if(v<0) return; PR[key]=v; saveProf();
+  if(key==='T') E.right = E.left + PR.T*k2();
+  render2();
+});
+$('pAuto').onclick=()=>{
+  const mh=measuredH(), ml=measuredL();
+  if(!mh&&!ml){ toast('Meet eerst de sleutel in stap 3 (met schaal)'); return; }
+  if(mh) PR.H=+mh.toFixed(2); if(ml) PR.L=+ml.toFixed(1);
+  saveProf(); fillProf(); render2(); toast('Maten overgenomen uit de meting');
+};
+
+// ---- doorsnede-editor ----
+const E={img:null,rot90:0,RW:400,RH:300,top:90,bottom:210,left:160,right:200,zoom:1,panX:0,panY:0};
+const cv2=$('cv2'), c2=cv2.getContext('2d'), rot2=document.createElement('canvas'); let w2=0,h2=0;
+function k2(){ return (E.bottom-E.top)/gH(); }
+function resetRect(){
+  const RW=E.RW,RH=E.RH, h=Math.min(RH*0.5, RW*0.5);
+  E.top=RH/2-h/2; E.bottom=RH/2+h/2; const k=h/gH(); E.left=RW/2-PR.T*k/2; E.right=E.left+PR.T*k;
+}
+resetRect();
+function loadSec(f){
+  if(!f) return; const url=URL.createObjectURL(f), im=new Image();
+  im.onload=()=>{ const sc=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)); const c=document.createElement('canvas');
+    c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+    URL.revokeObjectURL(url); E.img=c; E.rot90=0; E.zoom=1; E.panX=E.panY=0; buildRot2(); resetRect(); render2(); };
+  im.onerror=()=>toast('Kon de foto niet openen'); im.src=url;
+}
+$('secCam').addEventListener('change',e=>{loadSec(e.target.files[0]); e.target.value='';});
+$('secGal').addEventListener('change',e=>{loadSec(e.target.files[0]); e.target.value='';});
+function buildRot2(){
+  if(!E.img){ E.RW=400; E.RH=300; return; }
+  const im=E.img, sw=E.rot90%2===1; rot2.width=sw?im.height:im.width; rot2.height=sw?im.width:im.height;
+  const g=rot2.getContext('2d'); g.save(); g.translate(rot2.width/2,rot2.height/2); g.rotate(E.rot90*Math.PI/2); g.drawImage(im,-im.width/2,-im.height/2); g.restore();
+  E.RW=rot2.width; E.RH=rot2.height;
+}
+$('secRot').onclick=()=>{ E.rot90=(E.rot90+1)%4; E.zoom=1;E.panX=E.panY=0; buildRot2(); resetRect(); render2(); };
+function s2(){ return Math.min(w2/E.RW,h2/E.RH)*E.zoom; }
+function o2(){ const s=s2(); return [(w2-E.RW*s)/2+E.panX,(h2-E.RH*s)/2+E.panY]; }
+function ts2(x,y){ const s=s2(),[a,b]=o2(); return [x*s+a,y*s+b]; }
+function tw2(x,y){ const s=s2(),[a,b]=o2(); return [(x-a)/s,(y-b)/s]; }
+function zoom2(f){ const c=tw2(w2/2,h2/2); E.zoom=Math.max(1,Math.min(14,E.zoom*f)); E.panX=E.panY=0; const [x,y]=ts2(c[0],c[1]); E.panX=w2/2-x; E.panY=h2/2-y; if(E.zoom===1)E.panX=E.panY=0; render2(); }
+$('secIn').onclick=()=>zoom2(1.5); $('secOut').onclick=()=>zoom2(1/1.5);
+$('secFit').onclick=()=>{ E.zoom=1;E.panX=E.panY=0; render2(); };
+function resize2(){ const r=cv2.parentElement.clientWidth; if(!r) return; w2=r; h2=Math.round(Math.min(window.innerHeight*0.5, Math.max(260,r*0.75))); cv2.style.height=h2+'px'; cv2.width=Math.round(w2*dpr2()); cv2.height=Math.round(h2*dpr2()); render2(); }
+function dpr2(){ return window.devicePixelRatio||1; }
+window.addEventListener('resize',resize2);
+
+// doorsnede als polygon in (y vanaf onderkant, z vanaf linkerzijde), mm
+function sectionPoly(){
+  const H=gH(), T=PR.T, pts=[[0,0]];
+  const notch=(g,face)=>{
+    const c=H-g.top, w=Math.max(0.05,g.w), d=Math.min(g.d, T*0.45), y0=Math.max(0.01,c-w/2), y1=Math.min(H-0.01,c+w/2);
+    const z=face==='L'? d : T-d, z0=face==='L'?0:T;
+    return g.shape==='U' ? [[y0,z0],[y0,z],[y1,z],[y1,z0]] : [[y0,z0],[(y0+y1)/2,z],[y1,z0]];
+  };
+  PR.grooves.filter(g=>g.side==='L').sort((a,b)=>b.top-a.top).forEach(g=>pts.push(...notch(g,'L')));
+  pts.push([H,0],[H,T]);
+  PR.grooves.filter(g=>g.side==='R').sort((a,b)=>a.top-b.top).forEach(g=>pts.push(...notch(g,'R').reverse()));
+  pts.push([0,T]);
+  return pts;
+}
+function render2(){
+  if(!w2){ resize2(); if(!w2) return; }
+  const d=dpr2(); c2.setTransform(d,0,0,d,0,0); c2.fillStyle=E.img?'#0b0c0e':'#f4f1ea'; c2.fillRect(0,0,w2,h2);
+  const s=s2(),[ox,oy]=o2();
+  if(E.img) c2.drawImage(rot2,ox,oy,E.RW*s,E.RH*s);
+  const k=k2(), H=gH();
+  const toS=(y,z)=>ts2(E.left+z*k, E.bottom-y*k);
+  // doorsnede
+  const poly=sectionPoly();
+  c2.beginPath(); poly.forEach(([y,z],i)=>{ const [a,b]=toS(y,z); i?c2.lineTo(a,b):c2.moveTo(a,b); }); c2.closePath();
+  c2.fillStyle=E.img?'rgba(107,227,107,.12)':'rgba(217,196,142,.9)'; c2.fill();
+  c2.strokeStyle='rgba(0,0,0,.55)'; c2.lineWidth=4; c2.stroke(); c2.strokeStyle='#6be36b'; c2.lineWidth=2; c2.stroke();
+  if(gSel>=0 && PR.grooves[gSel]){ const g=PR.grooves[gSel]; const [a,b]=toS(H-g.top, g.side==='L'?0:PR.T); c2.save(); c2.setLineDash([4,4]); c2.strokeStyle='#fff'; c2.lineWidth=1.5; c2.beginPath(); c2.arc(a,b,14,0,Math.PI*2); c2.stroke(); c2.restore(); }
+  // lijnen
+  const [,ty]=ts2(0,E.top), [,by]=ts2(0,E.bottom), [lx]=ts2(E.left,0), [rx]=ts2(E.right,0);
+  const ln=(x1,y1,x2,y2,c)=>{ c2.beginPath(); c2.moveTo(x1,y1); c2.lineTo(x2,y2); c2.strokeStyle=c; c2.lineWidth=2; c2.stroke(); };
+  const hd=(x,y,c)=>{ c2.beginPath(); c2.arc(x,y,8,0,Math.PI*2); c2.fillStyle=c; c2.fill(); c2.lineWidth=2; c2.strokeStyle='#0b0c0e'; c2.stroke(); };
+  ln(0,ty,w2,ty,'#f3e04f'); ln(0,by,w2,by,'#4fd1e8'); ln(lx,0,lx,h2,'#ef5da8'); ln(rx,0,rx,h2,'#ef5da8');
+  hd(w2-20,ty,'#f3e04f'); hd(w2-20,by,'#4fd1e8'); hd(lx,h2-20,'#ef5da8'); hd(rx,h2-20,'#ef5da8');
+  c2.font='700 13px Inter,sans-serif'; c2.textAlign='center'; c2.textBaseline='middle'; c2.fillStyle=E.img?'#ef5da8':'#7a2a52';
+  c2.fillText('L',lx-14,(ty+by)/2); c2.fillText('R',rx+14,(ty+by)/2);
+  const lbl='dikte '+PR.T.toFixed(2)+' mm · hoogte '+H.toFixed(2)+' mm';
+  c2.font='600 12px Inter,sans-serif'; c2.textAlign='left'; const tw=c2.measureText(lbl).width;
+  c2.fillStyle='rgba(18,20,23,.82)'; c2.fillRect(6,5,tw+12,22); c2.fillStyle='#e9e6df'; c2.fillText(lbl,12,16);
+}
+// slepen in de doorsnede
+const p2=new Map(); let d2=null, pz2=null;
+function pos2(e){ const r=cv2.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; }
+cv2.addEventListener('pointerdown',e=>{
+  cv2.setPointerCapture(e.pointerId); p2.set(e.pointerId,pos2(e));
+  if(p2.size===2){ d2=null; const [a,b]=[...p2.values()]; pz2={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:E.zoom,w:tw2((a[0]+b[0])/2,(a[1]+b[1])/2)}; return; }
+  const [x,y]=pos2(e), [,ty]=ts2(0,E.top), [,by]=ts2(0,E.bottom), [lx]=ts2(E.left,0), [rx]=ts2(E.right,0);
+  const c=[['top',Math.abs(y-ty)],['bottom',Math.abs(y-by)],['left',Math.abs(x-lx)],['right',Math.abs(x-rx)]].sort((a,b)=>a[1]-b[1]);
+  d2 = c[0][1]<22 ? {k:c[0][0]} : {k:'pan',x,y,px:E.panX,py:E.panY};
+});
+cv2.addEventListener('pointermove',e=>{
+  if(!p2.has(e.pointerId)) return; p2.set(e.pointerId,pos2(e));
+  if(pz2&&p2.size>=2){ const [a,b]=[...p2.values()]; E.zoom=Math.max(1,Math.min(14,pz2.z*Math.hypot(a[0]-b[0],a[1]-b[1])/pz2.d)); E.panX=E.panY=0; const [sx,sy]=ts2(pz2.w[0],pz2.w[1]); E.panX=(a[0]+b[0])/2-sx; E.panY=(a[1]+b[1])/2-sy; render2(); return; }
+  if(!d2) return; const [x,y]=pos2(e), [wx,wy]=tw2(x,y);
+  if(d2.k==='pan'){ if(E.zoom>1){ E.panX=d2.px+x-d2.x; E.panY=d2.py+y-d2.y; render2(); } return; }
+  if(d2.k==='top') E.top=Math.min(wy,E.bottom-5); else if(d2.k==='bottom') E.bottom=Math.max(wy,E.top+5);
+  else if(d2.k==='left') E.left=Math.min(wx,E.right-2); else if(d2.k==='right') E.right=Math.max(wx,E.left+2);
+  if(E.img){ PR.T=+((E.right-E.left)/k2()).toFixed(2); $('pT').value=PR.T.toFixed(2); }
+  render2();
+});
+const end2=e=>{ p2.delete(e.pointerId); if(p2.size<2) pz2=null; if(!p2.size){ if(d2&&d2.k!=='pan') saveProf(); d2=null; } };
+cv2.addEventListener('pointerup',end2); cv2.addEventListener('pointercancel',end2);
+
+// groeven-lijst
+function stepper(label,val,onv){
+  const w=document.createElement('div'); const l=document.createElement('label'); l.textContent=label; w.appendChild(l);
+  const s=document.createElement('div'); s.className='stp';
+  const m=document.createElement('button'), i=document.createElement('input'), p=document.createElement('button');
+  m.textContent='−'; p.textContent='+'; i.type='number'; i.step='0.05'; i.value=val.toFixed(2);
+  const set=v=>{ v=Math.max(0,Math.round(v*100)/100); i.value=v.toFixed(2); onv(v); };
+  m.onclick=()=>set(parseFloat(i.value)-0.05); p.onclick=()=>set(parseFloat(i.value)+0.05);
+  i.oninput=()=>{ const v=parseFloat(i.value); if(isFinite(v)&&v>=0) onv(v); };
+  s.append(m,i,p); w.appendChild(s); return w;
+}
+function renderGrooves(){
+  const box=$('grooves'); box.innerHTML='';
+  PR.grooves.forEach((g,i)=>{
+    const d=document.createElement('div'); d.className='groove'+(i===gSel?' on':''); d.onclick=()=>{ if(gSel!==i){ gSel=i; box.querySelectorAll('.groove').forEach((x,j)=>x.classList.toggle('on',j===i)); render2(); } };
+    const h=document.createElement('div'); h.className='ghead';
+    const b=document.createElement('b'); b.textContent='Groef '+(i+1);
+    const side=document.createElement('select'); side.innerHTML='<option value="L">Links</option><option value="R">Rechts</option>'; side.value=g.side;
+    side.onchange=()=>{ g.side=side.value; saveProf(); render2(); };
+    const shape=document.createElement('select'); shape.innerHTML='<option value="V">V-vorm</option><option value="U">Recht</option>'; shape.value=g.shape;
+    shape.onchange=()=>{ g.shape=shape.value; saveProf(); render2(); };
+    const del=document.createElement('button'); del.className='btn sm'; del.textContent='✕'; del.style.minHeight='34px';
+    del.onclick=ev=>{ ev.stopPropagation(); PR.grooves.splice(i,1); gSel=-1; saveProf(); renderGrooves(); render2(); };
+    h.append(b,side,shape,del); d.appendChild(h);
+    const gr=document.createElement('div'); gr.className='grid3';
+    gr.append(stepper('Midden v. boven',g.top,v=>{g.top=v;saveProf();render2();}), stepper('Breedte',g.w,v=>{g.w=v;saveProf();render2();}), stepper('Diepte',g.d,v=>{g.d=v;saveProf();render2();}));
+    d.appendChild(gr); box.appendChild(d);
+  });
+}
+function addGroove(side){
+  const H=gH(), n=PR.grooves.filter(g=>g.side===side).length;
+  PR.grooves.push({side, top:+(H*(0.3+0.25*n)%H).toFixed(2), w:0.8, d:0.4, shape:'V'});
+  gSel=PR.grooves.length-1; saveProf(); renderGrooves(); render2();
+}
+$('addL').onclick=()=>addGroove('L'); $('addR').onclick=()=>addGroove('R');
+
+// ---- OpenSCAD ----
+const f2=v=>(+v).toFixed(3).replace(/\.?0+$/,'');
+function simplify(pts){
+  const o=[];
+  for(const p of pts){ const q=o[o.length-1]; if(q&&Math.abs(q[0]-p[0])<1e-9&&Math.abs(q[1]-p[1])<1e-9) continue; o.push(p); }
+  for(let i=o.length-2;i>=1;i--){ const a=o[i-1],b=o[i],c=o[i+1]; if(Math.abs((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]))<1e-7) o.splice(i,1); }
+  return o;
+}
+function scadCode(){
+  const A=(isFree()&&sideData('A'))||[], B=(isFree()&&sideData('B'))||[];
+  const H=gH(), T=PR.T, L=gL(), tip=PR.tip, step=0.05;
+  const top=[], bot=[];
+  for(let x=0;x<=L+1e-9;x+=step){ top.push([x, H-(A.length?tplDepth(x,A):0)]); bot.push([x, B.length?tplDepth(x,B):0]); }
+  const side=simplify([[-1,0],[-1,H],...top,[L,H],[L+tip,H/2],[L,0],...bot.reverse()]);
+  const sec=simplify(sectionPoly());
+  const r=Math.min(3,PR.bowH/4,PR.bowL/4);
+  const cutsTxt=s=>s.map((c,i)=>`//   ${i+1}: ${c.pos.toFixed(2)} mm vanaf schouder, ${c.depth.toFixed(2)} mm diep`).join('\n');
+  return `// Sleutel — gemaakt met de Sleutelcode-app
+// Open in OpenSCAD, druk F6 (render) en kies File > Export > STL.
+// Alle maten in mm. X = lengte (0 = schouder), Y = hoogte, Z = dikte.
+${A.length?'// Inkepingen kant A (boven):\n'+cutsTxt(A)+'\n':''}${B.length?'// Inkepingen kant B (onder):\n'+cutsTxt(B)+'\n':''}// Groeven: ${PR.grooves.length?PR.grooves.map(g=>`${g.side==='L'?'links':'rechts'} ${g.top.toFixed(2)} v. boven, ${g.w.toFixed(2)} breed, ${g.d.toFixed(2)} diep (${g.shape})`).join('; '):'geen'}
+
+$fn = 48;
+H = ${f2(H)};      // bladhoogte
+T = ${f2(T)};      // dikte
+L = ${f2(L)};      // bladlengte vanaf schouder
+TIP = ${f2(tip)};  // lengte punt
+BOW_L = ${f2(PR.bowL)};
+BOW_H = ${f2(PR.bowH)};
+HOLE = ${f2(PR.hole)};
+
+// zijaanzicht van het blad, met inkepingen en punt (X,Y)
+side = [${side.map(p=>`[${f2(p[0])},${f2(p[1])}]`).join(',')}];
+// doorsnede met groeven (Y,Z)
+section = [${sec.map(p=>`[${f2(p[0])},${f2(p[1])}]`).join(',')}];
+
+module blade() {
+  intersection() {
+    linear_extrude(height = T) polygon(side);
+    translate([-1, 0, 0]) rotate([90, 0, 90])
+      linear_extrude(height = L + TIP + 2) polygon(section);
+  }
+}
+
+module bow() {
+  r = ${f2(r)};
+  difference() {
+    hull() for (p = [[-BOW_L + r, H/2 - BOW_H/2 + r], [-BOW_L + r, H/2 + BOW_H/2 - r],
+                     [-r, H/2 - BOW_H/2 + r], [-r, H/2 + BOW_H/2 - r]])
+      translate([p[0], p[1], 0]) cylinder(r = r, h = T);
+    if (HOLE > 0) translate([-BOW_L + HOLE/2 + 2, H/2, -1]) cylinder(d = HOLE, h = T + 2);
+  }
+}
+
+union() {
+  blade();
+  translate([0.01, 0, 0]) bow();
+}
+`;
+}
+function profText(){
+  const H=gH(); const l=['Profiel: bladhoogte '+H.toFixed(2)+' mm, dikte '+PR.T.toFixed(2)+' mm, bladlengte '+gL().toFixed(1)+' mm'];
+  if(PR.grooves.length){ l.push('Groeven in de lengte (gezien vanaf de punt, inkepingen boven):'); PR.grooves.forEach((g,i)=>l.push(`  ${i+1}: ${g.side==='L'?'links':'rechts'}, midden ${g.top.toFixed(2)} mm v. bovenkant, ${g.w.toFixed(2)} breed, ${g.d.toFixed(2)} diep (${g.shape==='V'?'V-vorm':'recht'})`)); }
+  return l.join('\n');
+}
+
+// ---- zip (zonder compressie) ----
+const CRC=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(b){ let c=0xFFFFFFFF; for(let i=0;i<b.length;i++) c=CRC[(c^b[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function makeZip(files){
+  const enc=new TextEncoder(), parts=[], cen=[]; let off=0;
+  for(const f of files){
+    const name=enc.encode(f.name), data=typeof f.data==='string'?enc.encode(f.data):f.data, crc=crc32(data);
+    const h=new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true); h.setUint16(4,20,true); h.setUint16(6,0x0800,true); h.setUint16(8,0,true);
+    h.setUint16(10,0,true); h.setUint16(12,0x21,true); h.setUint32(14,crc,true); h.setUint32(18,data.length,true); h.setUint32(22,data.length,true);
+    h.setUint16(26,name.length,true); h.setUint16(28,0,true);
+    parts.push(new Uint8Array(h.buffer),name,data);
+    const c=new DataView(new ArrayBuffer(46));
+    c.setUint32(0,0x02014b50,true); c.setUint16(4,20,true); c.setUint16(6,20,true); c.setUint16(8,0x0800,true); c.setUint16(10,0,true);
+    c.setUint16(12,0,true); c.setUint16(14,0x21,true); c.setUint32(16,crc,true); c.setUint32(20,data.length,true); c.setUint32(24,data.length,true);
+    c.setUint16(28,name.length,true); c.setUint32(42,off,true);
+    cen.push(new Uint8Array(c.buffer),name);
+    off+=30+name.length+data.length;
+  }
+  const cs=cen.reduce((a,b)=>a+b.length,0), e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true); e.setUint16(8,files.length,true); e.setUint16(10,files.length,true); e.setUint32(12,cs,true); e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/zip'});
+}
+let downloads=null;
+if(AND){
+  const toB64=data=>new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(String(fr.result).split(',')[1]||''); fr.onerror=()=>rej(fr.error); fr.readAsDataURL(data instanceof Blob?data:new Blob([data])); });
+  downloads={ save: async({filename,data})=>{ const ok=AND.saveFile(filename, await toB64(data)); if(!ok) throw {code:'unavailable'}; return {status:'saved'}; } };
+} else (async()=>{ try{ if(window.claude&&window.claude.use) downloads=await window.claude.use('downloads'); }catch(e){} })();
+$('dlModel').onclick=async()=>{
+  const scad=scadCode(), txt=copyText()+'\n\n'+profText()+'\n';
+  if(!downloads){ showScad(scad); toast('Downloaden kan hier niet. Kopieer de code hieronder.'); return; }
+  try{ await downloads.save({filename:'sleutel-3d.zip', data:makeZip([{name:'sleutel.scad',data:scad},{name:'maten.txt',data:txt}])}); if(!AND) toast('Opgeslagen'); }
+  catch(err){ const c=err&&err.code; if(c==='declined') return; if(c==='host_unavailable') toast('Opslaan lukt niet in deze app. Open de pagina in de browser.'); else toast('Downloaden lukt niet. Kopieer de code hieronder.'); showScad(scad); }
+};
+function showScad(t){ const a=$('scadFallback'); a.classList.remove('hidden'); a.value=t; }
+$('copyScad').onclick=()=>{ const t=scadCode(); try{ clip(t).then(()=>toast('OpenSCAD-code gekopieerd'),()=>{showScad(t);toast('Selecteer en kopieer de code hieronder');}); }catch(e){ showScad(t); } };
+
+// profieltekst mee in "Kopieer voor sleutelmaker"
+const _copyText=copyText;
+copyText=function(){ return isFree()? _copyText()+'\n'+profText() : _copyText(); };
+
+function showProf(){ $('profCard').classList.toggle('hidden',!isFree()); if(isFree()){ fillProf(); resize2(); } }
+sel.addEventListener('change',showProf);
+fillProf(); renderGrooves();
+
+if(AND){ $('appFooter').classList.remove('hidden'); try{ $('appVer').textContent='Sleutelcode '+AND.version(); }catch(e){} $('appUpd').onclick=()=>AND.checkUpdates(); }
+
+setCalMode(S.cal.mode); onProfile(); renderSaved(); showProf();
+})();
+</script>
+</body>
+</html>
