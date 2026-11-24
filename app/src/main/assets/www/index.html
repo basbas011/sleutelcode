@@ -81,6 +81,11 @@
   .seg button{flex:1;appearance:none;border:0;background:#15171b;color:var(--muted);font:inherit;font-weight:600;padding:10px;cursor:pointer;min-height:42px}
   .seg button.on{background:var(--brass);color:#1a1405}
   .sidebox{margin-top:12px}
+  .help{background:#15171b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px}
+  .help summary{cursor:pointer;font-weight:600;color:var(--brass)}
+  .helplist{padding-left:18px;margin:6px 0;font-size:13.5px;color:var(--text)}
+  .helplist li{margin:6px 0}
+  .helplist ul{padding-left:16px;margin:4px 0;color:var(--muted)}
   .check{display:flex;align-items:center;gap:10px;color:var(--text);font-size:14px;margin:10px 0 0;cursor:pointer}
   .check input{width:20px;height:20px;accent-color:var(--brass)}
   .fitbar{display:flex;align-items:center;gap:10px;background:#15171b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
@@ -121,14 +126,14 @@
         <button data-m="blade">Bladhoogte gemeten</button>
       </div>
       <div id="calRef" style="margin-top:10px">
-        <label for="refLen">Afstand tussen de groene punten (mm)</label>
+        <label for="refLen">Hoe lang is de groene lijn in het echt? (mm)</label>
         <div class="row">
           <input type="number" id="refLen" step="0.01" value="10" style="flex:1;width:auto">
           <button class="btn sm" data-ref="10">10 mm</button>
           <button class="btn sm" data-ref="23.25">€1</button>
           <button class="btn sm" data-ref="25.75">€2</button>
         </div>
-        <p class="spec" style="margin-top:6px">Leg een liniaal (of munt) plat naast de sleutel. Zet straks de twee groene punten op twee streepjes die je kent, of op de rand van de munt.</p>
+        <p class="spec" style="margin-top:6px">Dit getal blijft staan als je de punten verschuift. Het zegt hoe lang de groene lijn in het echt is. Munt €1: punten op de rand, dwars door het midden (23,25). Liniaal: op 0 en 10 mm. Schuifmaat: meet de hele sleutel en zet de punten op kop en punt (bijv. 46,94).</p>
       </div>
       <div id="calBlade" class="hidden" style="margin-top:10px">
         <label for="bladeMm">Hoogte van het blad bij de schouder (mm, met schuifmaat)</label>
@@ -161,6 +166,9 @@
         <input type="file" accept="image/*" id="fileGal">
       </label>
     </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm grow" id="demoBtn">🧪 Eerst oefenen met een voorbeeldsleutel</button>
+    </div>
     <ul class="tips">
       <li>Leg de sleutel plat op <b>wit papier</b>, inkepingen naar boven.</li>
       <li id="tipRuler">Leg een <b>liniaal</b> (of munt) er vlak naast, op dezelfde hoogte.</li>
@@ -174,13 +182,49 @@
     <div class="row">
       <button class="btn sm" id="rotL" title="90° linksom">↺ 90°</button>
       <button class="btn sm" id="rotR" title="90° rechtsom">↻ 90°</button>
-      <button class="btn sm" id="mirror" title="Spiegelen">⇋ Spiegel</button>
+      <button class="btn sm" id="mirror" title="Spiegelen links/rechts">⇋ Spiegel</button>
+      <button class="btn sm" id="flipV" title="Inkepingen van onder naar boven">⇅ Omdraaien</button>
       <span class="grow"></span>
       <button class="btn sm" id="zoomOut">−</button>
       <button class="btn sm" id="zoomIn">+</button>
       <button class="btn sm" id="zoomReset">Passend</button>
     </div>
     <div class="slider" style="margin-top:10px">Recht zetten <input type="range" id="fine" min="-20" max="20" step="0.1" value="0"><span id="fineVal" style="width:44px;text-align:right">0°</span></div>
+
+    <details class="help" id="helpBox">
+      <summary>❓ Hoe werkt het? Uitleg met plaatje</summary>
+      <svg viewBox="0 0 360 230" role="img" aria-label="Uitleg van de lijnen op een sleutel" style="width:100%;display:block;margin:8px 0;background:#f4f1ea;border-radius:10px">
+        <circle cx="300" cy="62" r="40" fill="#d8c27a" stroke="#8a7432" stroke-width="2"/>
+        <text x="300" y="66" text-anchor="middle" font-size="13" font-weight="700" fill="#5b4a1a">€1</text>
+        <line x1="260" y1="62" x2="340" y2="62" stroke="#2e9d2e" stroke-width="3"/>
+        <circle cx="260" cy="62" r="6" fill="#6be36b" stroke="#000"/><circle cx="340" cy="62" r="6" fill="#6be36b" stroke="#000"/>
+        <circle cx="62" cy="150" r="44" fill="#c9c9c9" stroke="#777" stroke-width="2"/><circle cx="46" cy="150" r="10" fill="#f4f1ea" stroke="#777"/>
+        <path d="M100 132 L120 132 L132 146 L146 132 L170 132 L184 152 L198 132 L222 132 L232 142 L242 132 L262 132 L285 150 L262 168 L100 168 Z" fill="#b5b5b5" stroke="#666" stroke-width="2"/>
+        <line x1="100" y1="10" x2="100" y2="222" stroke="#ef5da8" stroke-width="3"/>
+        <line x1="10" y1="132" x2="350" y2="132" stroke="#c9b400" stroke-width="3"/>
+        <line x1="10" y1="168" x2="350" y2="168" stroke="#2bb3cc" stroke-width="3"/>
+        <circle cx="132" cy="146" r="6" fill="#e8b54a" stroke="#000"/><circle cx="184" cy="152" r="6" fill="#e8b54a" stroke="#000"/><circle cx="232" cy="142" r="6" fill="#e8b54a" stroke="#000"/>
+        <g font-size="11" font-weight="700">
+          <text x="106" y="22" fill="#b0306f">① schouder</text>
+          <text x="140" y="124" fill="#8a7a00">② bovenkant blad</text>
+          <text x="140" y="184" fill="#1d8a9e">③ onderkant blad</text>
+          <text x="300" y="118" text-anchor="middle" fill="#2e7d2e">④ 23,25 mm</text>
+          <text x="196" y="206" fill="#9a6a10">⑤ bolletjes in de inkepingen</text>
+        </g>
+      </svg>
+      <ol class="helplist">
+        <li><b style="color:var(--mag)">① Schouder</b>: de plek waar de sleutel tegen het slot stopt. Meestal is dat de stap waar de kop overgaat in het smalle blad. Alle posities worden vanaf hier gemeten.</li>
+        <li><b style="color:var(--yellow)">② Bovenkant blad</b>: de rechte, <b>onbewerkte</b> bovenrand, vlak naast de schouder. Vanaf deze lijn wordt de diepte van elke inkeping gemeten.</li>
+        <li><b style="color:var(--cyan)">③ Onderkant blad</b>: de onderrand van het blad. Zo weet de app hoe hoog het blad is.</li>
+        <li><b style="color:var(--green)">④ Groene punten = de schaal</b>: zet ze op twee punten waarvan je de echte afstand weet, en vul die afstand in bij stap 1. Het getal verandert niet als je de punten verschuift. Het vertelt de app hoe lang de lijn <b>in het echt</b> is. Voorbeelden:
+          <ul><li>€1-munt: punten links en rechts op de rand, dwars door het midden → <b>23,25</b></li>
+          <li>Liniaal: punten op 0 en 10 mm → <b>10</b></li>
+          <li>Schuifmaat: meet de hele sleutel (kop tot punt) en zet de punten op begin en eind → bijv. <b>46,94</b></li></ul></li>
+        <li><b style="color:var(--brass)">⑤ Bolletjes</b>: één per inkeping, op het <b>diepste</b> punt. <b>Inkepingen zoeken</b> doet dit automatisch; controleer daarna en schuif bij waar nodig.</li>
+      </ol>
+      <p class="spec">Zitten de inkepingen aan de onderkant, zoals op je foto? Tik dan <b>⇅ Omdraaien</b>. Zit de kop rechts, tik dan <b>⇋ Spiegel</b>. Zoom met twee vingers in om de lijnen precies te zetten.</p>
+      <button class="btn sm" id="demoBtn2" style="width:100%">🧪 Voorbeeld laden (alle lijnen staan al goed)</button>
+    </details>
 
     <div class="sidebox" id="sideBox">
       <div class="seg" id="sideSeg">
@@ -521,7 +565,7 @@ $('fitBtn').onclick=()=>{
 };
 
 // ---------- image ----------
-function loadFile(f){
+function loadFile(f, after){
   if(!f) return;
   const url = URL.createObjectURL(f);
   const im = new Image();
@@ -535,6 +579,7 @@ function loadFile(f){
     $('work').style.display='block';
     buildRot(true);
     resize();
+    if(after) after();
     $('work').scrollIntoView({behavior:'smooth',block:'start'});
   };
   im.onerror=()=>toast('Kon de foto niet openen');
@@ -645,7 +690,7 @@ function renderFree(ty,by,h){
       ctx.beginPath(); ctx.arc(a,b,7,0,Math.PI*2); ctx.fillStyle='rgba(107,227,107,.85)'; ctx.fill(); ctx.strokeStyle='#0b0c0e'; ctx.lineWidth=1.5; ctx.stroke();
       ctx.fillStyle='#0b0c0e'; ctx.font='700 9px Inter,sans-serif'; ctx.fillText(n,a,b+.5);
     }
-    ctx.font='700 12px Inter,sans-serif'; ctx.fillStyle='#6be36b'; ctx.fillText(S.cal.refLen+' mm',(a1+a2)/2,(b1+b2)/2-14);
+    ctx.font='700 12px Inter,sans-serif'; ctx.fillStyle='#6be36b'; ctx.fillText('= '+S.cal.refLen+' mm in het echt',(a1+a2)/2,(b1+b2)/2-14);
   }
   if(S.tipX!=null){ const [tx]=toScreen(S.tipX,0); ctx.setLineDash([3,5]); line(tx,ty-10,tx,by+10,'rgba(255,255,255,.5)',1); ctx.setLineDash([]); }
   if(k && S.tpl.show && S.marks.length){
@@ -789,6 +834,46 @@ $('zoomReset').onclick=()=>{S.zoom=1;S.panX=0;S.panY=0;render();};
 $('rotL').onclick=()=>{S.rot90=(S.rot90+3)%4; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
 $('rotR').onclick=()=>{S.rot90=(S.rot90+1)%4; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
 $('mirror').onclick=()=>{S.mirror=!S.mirror; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
+$('flipV').onclick=()=>{S.rot90=(S.rot90+2)%4; S.mirror=!S.mirror; S.zoom=1;S.panX=S.panY=0; buildRot(true);};
+// ---------- voorbeeldsleutel ----------
+function loadDemo(){
+  const k=20, c=document.createElement('canvas'); c.width=1400; c.height=760; const g=c.getContext('2d');
+  g.fillStyle='#f2f1ec'; g.fillRect(0,0,c.width,c.height);
+  const sh=330, top=250, bh=6.5*k, bot=top+bh;
+  // kop
+  g.fillStyle='#b7b7b2'; g.beginPath(); g.arc(200,top+bh/2,150,0,Math.PI*2); g.fill();
+  g.fillStyle='#f2f1ec'; g.beginPath(); g.arc(130,top+bh/2,28,0,Math.PI*2); g.fill();
+  g.fillStyle='#b7b7b2'; g.fillRect(300,top-25,sh-300,bh+50);
+  // blad met inkepingen (V, 100°)
+  const cuts=[[3.0,1.4],[6.2,0.6],[9.4,1.8],[12.6,0.9]], t=Math.tan(50*Math.PI/180);
+  g.beginPath(); g.moveTo(sh,top);
+  cuts.forEach(([p,d])=>{ const x=sh+p*k, hf=0.2*k; g.lineTo(x-hf-d*k*t,top); g.lineTo(x-hf,top+d*k); g.lineTo(x+hf,top+d*k); g.lineTo(x+hf+d*k*t,top); });
+  const L=sh+16*k; g.lineTo(L,top); g.lineTo(L+bh*0.5,top+bh/2); g.lineTo(L,bot); g.lineTo(sh,bot); g.closePath(); g.fill();
+  // groef (donkere streep)
+  g.fillStyle='#9d9d98'; g.fillRect(sh+10,top+bh*0.55,16*k-20,bh*0.12);
+  // munt
+  g.fillStyle='#d4bd73'; g.beginPath(); g.arc(1050,580,23.25*k/2,0,Math.PI*2); g.fill();
+  g.fillStyle='#bdbdb8'; g.beginPath(); g.arc(1050,580,23.25*k/2*0.7,0,Math.PI*2); g.fill();
+  g.fillStyle='#6b6b66'; g.font='700 70px sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText('1',1050,580);
+  c.toBlob(b=>{
+    sel.value='free'; onProfile(); showProf(); setCalMode('ref');
+    S.cal.refLen=23.25; $('refLen').value='23.25'; store.set('sc_reflen',23.25);
+    S.side='A'; S.frozen={A:null,B:null}; document.querySelectorAll('#sideSeg button').forEach(x=>x.classList.toggle('on',x.dataset.s==='A'));
+    loadFile(b, ()=>{
+      S.shoulderX=sh; S.topY=top; S.bottomY=bot;
+      S.ref=[{x:1050-23.25*k/2,y:580},{x:1050+23.25*k/2,y:580}];
+      autoFree(); $('fitBtn').click();
+      // inzoomen op het blad
+      const x0=S.shoulderX-bh*0.6, x1=(S.tipX||S.shoulderX+3*bh)+bh*0.3, cy=(S.topY+S.bottomY)/2;
+      const s0=Math.min(cssW/S.RW,cssH/S.RH); S.zoom=Math.max(1,Math.min(8,cssW/((x1-x0)*s0)));
+      S.panX=0;S.panY=0; const [px,py]=toScreen((x0+x1)/2,cy); S.panX=cssW/2-px; S.panY=cssH/2-py; render();
+      $('helpBox').open=true;
+      toast('Voorbeeld geladen: zo horen de lijnen te staan');
+    });
+  },'image/png');
+}
+$('demoBtn').onclick=loadDemo; $('demoBtn2').onclick=loadDemo;
+
 let fineT=null;
 $('fine').addEventListener('input',e=>{ S.fine=+e.target.value; $('fineVal').textContent=S.fine.toFixed(1)+'°'; clearTimeout(fineT); fineT=setTimeout(()=>buildRot(false),40); });
 
